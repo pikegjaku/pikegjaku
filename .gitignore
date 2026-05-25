@@ -1,0 +1,31 @@
+# Ignores
+
+**/node_modules
+**/.expo
+**/.next
+**/.astro
+**/*.tsbuildinfo
+**/dist
+**/web-build
+**/.DS_Store
+**/expo-env.d.ts
+**/ios
+**/android
+**/npm-debug.*
+**/.orig.*
+**/.jks
+**/.p8
+**/.p12
+**/.key
+**/.mobileprovision
+**/.env
+**/bun.lockb
+**/.api
+*/package-lock.json
+*/*/package-lock.json
+
+
+# temp
+app
+api
+admin

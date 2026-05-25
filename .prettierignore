@@ -1,0 +1,14 @@
+dist
+build
+node_modules
+.expo
+android
+ios
+.api
+bun.lock
+bun.lockb
+package-lock.json
+.astro
+app
+api
+admin

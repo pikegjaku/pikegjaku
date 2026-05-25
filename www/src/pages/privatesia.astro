@@ -1,0 +1,43 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro'
+import LegalPage from '@/components/LegalPage.astro'
+
+const sections = [
+    {
+        title: 'Informacioni që mbledhim',
+        content:
+            'Ne mbledhim vetëm informacionin e nevojshëm për funksionimin e platformës: numrin e telefonit, emrin, mbiemrin, kategorinë e gjakut, qytetin dhe shtetin. Këto të dhëna janë të nevojshme për të mundësuar lidhjen midis dhuruesve dhe atyre që kanë nevojë për gjak.'
+    },
+    {
+        title: 'Si e përdorim informacionin',
+        content:
+            'Informacioni juaj përdoret vetëm për qëllimet e platformës: shfaqjen e urgjencave, njoftimin e dhuruesve të mundshëm dhe menaxhimin e llogarisë suaj. Ne nuk e shesim, ndajmë ose transferojmë informacionin tuaj tek palë të treta pa lejen tuaj.'
+    },
+    {
+        title: 'Ruajtja e të dhënave',
+        content:
+            'Informacioni juaj personal ruhet në mënyrë të sigurt dhe mbrohet me metoda moderne të sigurisë. Ne nuk mbledhim informacione të ndjeshme si ato bankare. Të dhënat tuaja ruhen për aq kohë sa keni llogarinë aktive në platformë.'
+    },
+    {
+        title: 'Të drejtat tuaja',
+        content:
+            'Ju keni të drejtë të shikoni, ndryshoni ose fshini të dhënat tuaja personale në çdo kohë përmes cilësimeve të llogarisë. Gjithashtu mund të mbyllni llogarinë tuaj dhe të gjitha të dhënat do të fshihen përgjithmonë.'
+    },
+    {
+        title: 'Ndryshimet në politikë',
+        content:
+            'Ne mund të ndryshojmë politikën tonë të privatësisë në çdo kohë. Ju lutemi kontrolloni këtë faqe për të parë ndryshimet e fundit. Nëse keni pyetje ose keni nevojë për ndihmë shtesë, ju lutemi të na kontaktoni në email.'
+    }
+]
+---
+
+<LegalLayout
+    title='Politika e Privatësisë - Pikëgjaku'
+    description='Kjo politikë e privatësisë përshkruan se si Pikëgjaku mbledh, përdor dhe mbrojt informacionin tuaj personal kur përdorni platformën tonë.'
+>
+    <LegalPage
+        title='Politika e Privatësisë'
+        subtitle='Kjo politikë e privatësisë përshkruan se si Pikëgjaku mbledh, përdor dhe mbrojt informacionin tuaj personal kur përdorni platformën tonë.'
+        sections={sections}
+    />
+</LegalLayout>

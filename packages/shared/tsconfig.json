@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "declaration": true,
+        "esModuleInterop": true,
+        "moduleResolution": "bundler",
+        "target": "ESNext",
+        "module": "ESNext",
+        "noEmit": true,
+        "baseUrl": "./",
+        "paths": {
+            "@pikegjaku/shared": ["."],
+            "@pikegjaku/shared/*": ["./*"]
+        }
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules"]
+}

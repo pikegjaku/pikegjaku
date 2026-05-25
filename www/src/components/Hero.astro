@@ -1,0 +1,291 @@
+---
+import type { HeroProps } from '@/ts/Interfaces'
+import Tag from '@/components/Tag.astro'
+import Input from '@/components/Input.astro'
+import Button from '@/components/Button.astro'
+
+interface Props extends HeroProps {}
+
+const { tag, title, subtitle, inputPlaceholder, buttonLabel, backgroundImage, subscribedLabel, subscribeError, subscribeRateLimited } = Astro.props
+---
+
+<section class='hero'>
+    <div class='hero-content'>
+        <div class='hero-inner'>
+            <Tag label={tag} />
+
+            <div class='hero-heading'>
+                <h1>{title}</h1>
+            </div>
+
+            <div class='hero-subtitle'>
+                <p>{subtitle}</p>
+            </div>
+
+            <form
+                class='hero-form'
+                id='waitlist-form'
+                data-subscribed={subscribedLabel}
+                data-error={subscribeError}
+                data-rate-limited={subscribeRateLimited}
+            >
+                <Input
+                    placeholder={inputPlaceholder}
+                    type='email'
+                    name='Email'
+                    required={true}
+                />
+                <Button label={buttonLabel} />
+            </form>
+
+            <div class='hero-message' id='waitlist-message' aria-live='polite'></div>
+        </div>
+    </div>
+
+    <div class='hero-bg'>
+        <div class='hero-overlay'></div>
+        <div class='hero-noise'></div>
+        <div class='hero-image'>
+            <img
+                src={backgroundImage}
+                alt=''
+                loading='eager'
+                decoding='async'
+                fetchpriority='high'
+                width='1280'
+                height='853'
+            />
+        </div>
+    </div>
+</section>
+
+<script src='@/scripts/waitlist.ts'></script>
+
+<style>
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes bgZoomIn {
+        from {
+            opacity: 0;
+            transform: scale(1.12);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1.0);
+        }
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .hero {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 80px;
+        width: 100%;
+        height: 100vh;
+        padding: 80px 16px 64px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-content {
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 32px;
+        width: 100%;
+        max-width: 600px;
+        position: relative;
+        animation: fadeInUp 0.8s ease-out both;
+        animation-delay: 0.2s;
+    }
+
+    .hero-inner {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+    }
+
+    .hero-heading {
+        width: 100%;
+        text-align: center;
+    }
+
+    .hero-heading h1 {
+        font-family: var(--font-family-heading);
+        font-size: 56px;
+        font-weight: 400;
+        letter-spacing: -0.03em;
+        line-height: 1em;
+        color: white;
+        margin: 0;
+    }
+
+    .hero-subtitle {
+        width: 100%;
+        max-width: 90%;
+        text-align: center;
+    }
+
+    .hero-subtitle p {
+        font-family: var(--font-family-body);
+        font-size: 15px;
+        font-weight: 400;
+        line-height: 1.4em;
+        color: rgba(255, 255, 255, 0.55);
+        margin: 0;
+        letter-spacing: 0.01em;
+    }
+
+    .hero-form {
+        z-index: 2;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-end;
+        gap: 8px;
+        width: 100%;
+        max-width: 440px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .hero-message {
+        display: none;
+        width: 100%;
+        max-width: 440px;
+        padding: 0 20px;
+        text-align: center;
+        font-family: var(--font-family-body);
+        font-size: 13px;
+        font-weight: 400;
+        line-height: 1.4em;
+        margin-top: -12px;
+    }
+
+    .hero-message-visible {
+        display: block;
+    }
+
+    .hero-message-error {
+        color: var(--color-brand-red);
+    }
+
+    .hero-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .hero-overlay {
+        z-index: 2;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            rgba(0, 0, 0, 0.25) 0%,
+            rgba(0, 0, 0, 0.15) 30%,
+            rgba(0, 0, 0, 0.2) 50%,
+            rgba(0, 0, 0, 0.75) 100%
+        );
+    }
+
+    .hero-noise {
+        z-index: 2;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.15;
+        background-image: url('/images/noise.png');
+        background-repeat: repeat;
+        background-position: center top;
+        background-size: 153.5px auto;
+        pointer-events: none;
+    }
+
+    .hero-image {
+        z-index: 1;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        animation: bgZoomIn 1.6s ease-out both;
+    }
+
+    .hero-image img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    @media (max-width: 809px) {
+        .hero {
+            padding: 80px 16px 80px;
+        }
+
+        .hero-heading h1 {
+            font-size: 40px;
+            line-height: 48px;
+        }
+
+        .hero-form {
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .hero-form :global(div) {
+            width: 100%;
+        }
+
+        .hero-form :global(.btn) {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hero {
+            padding: 60px 16px 60px;
+        }
+
+        .hero-heading h1 {
+            font-size: 32px;
+            line-height: 40px;
+        }
+
+        .hero-subtitle p {
+            font-size: 14px;
+        }
+    }
+</style>

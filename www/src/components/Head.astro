@@ -1,0 +1,53 @@
+---
+import type { HeadProps } from '@/ts/Interfaces'
+
+interface Props extends HeadProps {}
+
+const { title, description, themeColor = '#000000', noindex = false, schema = [] } = Astro.props
+const ogImage = '/og-image.webp'
+const siteUrl = 'https://pikegjaku.com'
+const pageUrl = `${siteUrl}${Astro.url.pathname}`
+---
+
+<meta charset='UTF-8' />
+<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+<meta name='description' content={description} />
+{noindex
+    ? <meta name='robots' content='noindex, nofollow' />
+    : <meta name='robots' content='index, follow' />
+}
+<meta name='theme-color' content={themeColor} />
+
+<link rel='preload' href='/fonts/host-grotesk-regular-latin.woff2' as='font' type='font/woff2' crossorigin />
+<link rel='preload' href='/fonts/host-grotesk-regular-latin-ext.woff2' as='font' type='font/woff2' crossorigin />
+<link rel='preload' href='/fonts/dm-sans-variable-latin.woff2' as='font' type='font/woff2' crossorigin />
+<link rel='preload' href='/fonts/dm-sans-variable-latin-ext.woff2' as='font' type='font/woff2' crossorigin />
+
+<meta property='og:type' content='website' />
+<meta property='og:title' content={title} />
+<meta property='og:description' content={description} />
+<meta property='og:image' content={`${siteUrl}${ogImage}`} />
+<meta property='og:url' content={pageUrl} />
+<meta property='og:site_name' content='Pikëgjaku' />
+<meta property='og:locale' content='sq_AL' />
+<meta property='og:image:width' content='1200' />
+<meta property='og:image:height' content='630' />
+<meta property='og:image:type' content='image/webp' />
+<meta property='og:image:alt' content='Pikëgjaku - Dhuro gjak' />
+
+<meta name='twitter:card' content='summary_large_image' />
+<meta name='twitter:title' content={title} />
+<meta name='twitter:description' content={description} />
+<meta name='twitter:image' content={`${siteUrl}${ogImage}`} />
+<meta name='twitter:image:alt' content='Pikëgjaku - Dhuro gjak' />
+
+<link rel='icon' type='image/svg+xml' href='/favicon.svg' />
+<link rel='icon' type='image/png' href='/favicon.png' />
+<link rel='apple-touch-icon' href='/apple-touch-icon.png' />
+<link rel='canonical' href={pageUrl} />
+
+<title>{title}</title>
+
+{schema.map((item) => (
+    <script type='application/ld+json' set:html={JSON.stringify(item)} />
+))}

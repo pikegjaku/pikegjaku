@@ -1,0 +1,28 @@
+---
+import type { IconProps } from '@/ts/Interfaces'
+import { readFileSync } from 'fs'
+import { resolve } from 'path'
+
+interface Props extends IconProps {}
+
+const { name, size = 24, weight = 'regular', class: className } = Astro.props
+
+const findIcon = () => {
+    const paths = [
+        resolve('node_modules/@phosphor-icons/core/assets', weight, `${name}.svg`),
+        resolve('../node_modules/@phosphor-icons/core/assets', weight, `${name}.svg`)
+    ]
+    for (const p of paths) {
+        try {
+            return readFileSync(p, 'utf-8')
+        } catch {}
+    }
+    return ''
+}
+
+const svgContent = findIcon()
+const styledSvg = svgContent
+    .replace('<svg ', `<svg width="${size}" height="${size}" class="${className || ''}" `)
+---
+
+<Fragment set:html={styledSvg} />

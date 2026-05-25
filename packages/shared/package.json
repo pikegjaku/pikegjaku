@@ -1,0 +1,21 @@
+{
+    "name": "@pikegjaku/shared",
+    "version": "0.0.1",
+    "private": true,
+    "main": "index.ts",
+    "types": "index.ts",
+    "exports": {
+        ".": "./index.ts",
+        "./constants": "./constants/index.ts",
+        "./constants/*": "./constants/*.ts",
+        "./helpers": "./helpers/index.ts",
+        "./helpers/*": "./helpers/*.ts",
+        "./validations": "./validations/index.ts",
+        "./validations/*": "./validations/*.ts",
+        "./ts": "./ts/index.ts",
+        "./ts/*": "./ts/*.ts"
+    },
+    "dependencies": {
+        "zod": "^3.23.8"
+    }
+}
