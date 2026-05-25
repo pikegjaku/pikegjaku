@@ -1,0 +1,38 @@
+---
+import type { HeaderProps } from '@/ts/Interfaces'
+import Logo from '@/components/Logo.astro'
+
+interface Props extends HeaderProps {}
+
+const { variant = 'dark' } = Astro.props
+---
+
+<nav class:list={['header', `header-${variant}`]}>
+    <Logo />
+</nav>
+
+<style>
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 24px;
+    }
+
+    .header-dark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        color: white;
+        background-color: transparent;
+    }
+
+    .header-light {
+        position: relative;
+        color: #1a1a1a;
+        background-color: white;
+        border-bottom: 1px solid #f0f0f0;
+    }
+</style>

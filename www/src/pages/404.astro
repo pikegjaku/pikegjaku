@@ -1,0 +1,16 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro'
+import NotFound from '@/components/NotFound.astro'
+---
+
+<LegalLayout
+    title='Faqja nuk u gjendë! - Pikëgjaku'
+    description='Kjo faqe që po kërkoni nuk ekziston, është fëshirë, ose nuk keni akses për ta parë.'
+    noindex={true}
+>
+    <NotFound
+        title='Faqja nuk u gjendë!'
+        description='Kjo faqe që po kërkoni nuk ekziston, është fëshirë, ose nuk keni akses për ta parë.'
+        backLabel='Kthehu'
+    />
+</LegalLayout>

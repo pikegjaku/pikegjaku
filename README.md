@@ -66,7 +66,7 @@ cd pikegjaku
 ### 2. Instaloni varësitë
 
 ```bash
-npm install
+bun install
 ```
 
 ### 3. Konfiguroni variablat e mjedisit
@@ -85,24 +85,24 @@ Të gjitha skriptat ekzekutohen nga root-i i projektit:
 
 ```bash
 # API (porti 9999)
-npm run api:dev
+bun run api:dev
 
 # Aplikacioni Mobil (Expo)
-npm run app:start
+bun run app:start
 
 # Uebi (Astro)
-npm run www:dev
+bun run www:dev
 
 # Paneli Admin (Vite)
-npm run admin:dev
+bun run admin:dev
 ```
 
 ### Formatimi & Linting
 
 ```bash
-npm run format    # Prettier + ESLint fix
-npm run lint      # ESLint check
-npm run check     # Format + lint
+bun run format    # Prettier + ESLint fix
+bun run lint      # ESLint check
+bun run check     # Format + lint
 ```
 
 ## Kontributi
@@ -113,7 +113,7 @@ Kontributet janë të mirëpritura! Sigurohuni që:
 2. Përdorni `@/` path aliases — asnjëherë importe relative
 3. Centralizoni tipet në `@/ts/`
 4. Përdorni sistemin e përkthimeve për çdo tekst të dukshëm nga përdoruesi
-5. Ekzekutoni `npm run check` para se të dërgoni një PR
+5. Ekzekutoni `bun run check` para se të dërgoni një PR
 
 ## Licenca
 

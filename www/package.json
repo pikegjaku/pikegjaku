@@ -1,0 +1,13 @@
+{
+    "name": "@pikegjaku/www",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@astrojs/sitemap": "^3.7.2",
+        "@phosphor-icons/core": "^2.1.1",
+        "@tailwindcss/vite": "^4.2.2",
+        "astro": "^6.1.1",
+        "tailwindcss": "^4.2.2",
+        "vite": "^8.0.3"
+    }
+}

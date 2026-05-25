@@ -1,0 +1,1 @@
+export { default as Timeout } from '@pikegjaku/shared/helpers/Timeout'

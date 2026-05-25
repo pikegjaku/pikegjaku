@@ -1,0 +1,19 @@
+# Pikëgjaku
+
+> Pikëgjaku is a free, voluntary blood donation platform connecting donors with people in urgent need across Kosovo, Albania, and North Macedonia. The mobile app enables users to post urgent blood requests, notify matching donors by blood type and location, and coordinate donations in real time.
+
+## Main Pages
+- [Home](https://pikegjaku.com): Landing page and waitlist signup
+- [Privacy Policy](https://pikegjaku.com/privatesia): Data collection and privacy practices
+- [Terms of Service](https://pikegjaku.com/kushtet-e-sherbimit): Platform usage terms
+
+## About
+- Platform: Mobile app (iOS and Android)
+- Coverage: Kosovo, Albania, North Macedonia
+- Cost: Free, no financial obligations
+- Language: Albanian (sq)
+- Data collected: Phone number, name, blood type, city, country
+- Status: Pre-launch (waitlist phase)
+
+## Contact
+- Website: https://pikegjaku.com

@@ -1,0 +1,43 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro'
+import LegalPage from '@/components/LegalPage.astro'
+
+const sections = [
+    {
+        title: 'Përdorimi i platformës',
+        content:
+            'Pikëgjaku është një platformë vullnetare që lidh njerëzit që duan të dhurojnë gjak me ata që kanë nevojë për të. Platforma ofrohet falas dhe pa asnjë detyrim financiar.'
+    },
+    {
+        title: 'Llogaritë e përdoruesve',
+        content:
+            'Për të postuar urgjenca ose për të kontaktuar dhuruesit, duhet të plotësoni profilin tuaj. Nuk keni leje të postoni urgjenca nëse nuk keni plotësuar profilin tuaj. Kjo është një formë e sigurisë për ju dhe përdoruesit e tjerë.'
+    },
+    {
+        title: 'Postimet dhe përmbajtja',
+        content:
+            'Të gjitha postimet në platformë janë të moderuara dhe mund të fshihen nëse nuk përputhen me kushtet e shërbimit. Çdo postim shqyrtohet nga ekipi ynë brenda një intervali të shkurtër kohor.'
+    },
+    {
+        title: 'Privatësia e informacionit',
+        content:
+            'Informatat e postuara në aplikacion nuk lejohen të ndahen me publikun në asnjë formë për arsye të privatësisë. Përdoruesit që shkelin këtë rregull mund të ndalohen nga platforma.'
+    },
+    {
+        title: 'Ndryshimet në kushte',
+        content:
+            'Ne mund të ndryshojmë kushtet e shërbimit në çdo kohë. Ju lutemi kontrolloni këtë faqe për të parë ndryshimet e fundit. Nëse keni pyetje ose keni nevojë për ndihmë shtesë, ju lutemi të na kontaktoni në email.'
+    }
+]
+---
+
+<LegalLayout
+    title='Kushtet e Shërbimit - Pikëgjaku'
+    description='Duke përdorur platformën Pikëgjaku, ju pranoni kushtet e mëposhtme. Ju lutemi lexoni me kujdes para se të vazhdoni.'
+>
+    <LegalPage
+        title='Kushtet e Shërbimit'
+        subtitle='Duke përdorur platformën Pikëgjaku, ju pranoni kushtet e mëposhtme. Ju lutemi lexoni me kujdes para se të vazhdoni.'
+        sections={sections}
+    />
+</LegalLayout>
