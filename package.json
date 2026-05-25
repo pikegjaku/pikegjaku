@@ -5,10 +5,7 @@
     "type": "module",
     "workspaces": [
         "packages/shared",
-        "app",
-        "api",
-        "www",
-        "admin"
+        "www"
     ],
     "scripts": {
         "prepare": "husky",
