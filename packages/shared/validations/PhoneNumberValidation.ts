@@ -26,7 +26,8 @@ export const PhoneNumberValidation = (
 
     if (!minLengthCase.success)
         return {
-            message: 'Numri i telefonit duhet të jetë më i gjatë se 8 karaktere!',
+            message:
+                'Numri i telefonit duhet të jetë më i gjatë se 8 karaktere!',
             error: true
         }
 
@@ -34,7 +35,8 @@ export const PhoneNumberValidation = (
 
     if (!maxLengthCase.success)
         return {
-            message: 'Numri i telefonit duhet të jetë më i shkurtë se 8 karaktere!',
+            message:
+                'Numri i telefonit duhet të jetë më i shkurtë se 8 karaktere!',
             error: true
         }
 

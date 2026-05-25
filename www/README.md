@@ -18,12 +18,12 @@ bun run www:lint      # Lint
 
 Set these in the Cloudflare Pages project settings (Environment variables):
 
-| Variable           | Required | Purpose                                  |
-| ------------------ | -------- | ---------------------------------------- |
-| `PUBLIC_API_URL`   | yes      | Base URL of the Pikëgjaku API (waitlist) |
-| `PUBLIC_GA_ID`     | no       | Google Analytics measurement ID          |
-| `PUBLIC_HOTJAR_ID` | no       | Hotjar site ID (numeric)                 |
-| `PUBLIC_CLARITY_ID`| no       | Microsoft Clarity project ID             |
+| Variable            | Required | Purpose                                  |
+| ------------------- | -------- | ---------------------------------------- |
+| `PUBLIC_API_URL`    | yes      | Base URL of the Pikëgjaku API (waitlist) |
+| `PUBLIC_GA_ID`      | no       | Google Analytics measurement ID          |
+| `PUBLIC_HOTJAR_ID`  | no       | Hotjar site ID (numeric)                 |
+| `PUBLIC_CLARITY_ID` | no       | Microsoft Clarity project ID             |
 
 For local dev, create `www/.env` with the same `PUBLIC_*` keys (Astro/Vite picks them up automatically).
 
@@ -34,7 +34,7 @@ For local dev, create `www/.env` with the same `PUBLIC_*` keys (Astro/Vite picks
 - Framework preset: **None**
 - Build command: `bun run www:build`
 - Build output directory: `www/dist`
-- Root directory: *(blank)*
+- Root directory: _(blank)_
 - Environment variables: see table above
 
 **Routing:**

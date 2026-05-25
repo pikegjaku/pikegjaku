@@ -28,7 +28,8 @@ export const CityNameValidation = (type: PostTypes): ValidationReturnType => {
         maxLengthCase.parse(type)
     } catch {
         return {
-            message: 'Emri i qytetit duhet të jetë më i shkurtë se 64 karaktere!',
+            message:
+                'Emri i qytetit duhet të jetë më i shkurtë se 64 karaktere!',
             error: true
         }
     }

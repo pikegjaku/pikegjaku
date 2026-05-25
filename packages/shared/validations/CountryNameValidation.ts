@@ -30,7 +30,8 @@ export const CountryNameValidation = (
         maxLengthCase.parse(type)
     } catch {
         return {
-            message: 'Emri i shtetit duhet të jetë më i shkurtë se 64 karaktere!',
+            message:
+                'Emri i shtetit duhet të jetë më i shkurtë se 64 karaktere!',
             error: true
         }
     }
