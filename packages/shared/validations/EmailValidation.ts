@@ -1,7 +1,7 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const EmailValidation = (email: string | null): ValidationReturnType => {
+const EmailValidation = (email: string | null): ValidationReturnType => {
     const requiredCase = z.string().min(1).safeParse(email)
 
     if (!requiredCase.success)

@@ -40,7 +40,8 @@ const { label, type = 'submit', href } = Astro.props
     }
 
     .btn:disabled {
-        cursor: not-allowed;
+        cursor: default;
+        pointer-events: none;
         opacity: 0.85;
     }
 

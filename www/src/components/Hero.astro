@@ -25,6 +25,7 @@ const { tag, title, subtitle, inputPlaceholder, buttonLabel, backgroundImage, su
             <form
                 class='hero-form'
                 id='waitlist-form'
+                novalidate
                 data-subscribed={subscribedLabel}
                 data-error={subscribeError}
                 data-rate-limited={subscribeRateLimited}
@@ -33,7 +34,7 @@ const { tag, title, subtitle, inputPlaceholder, buttonLabel, backgroundImage, su
                     placeholder={inputPlaceholder}
                     type='email'
                     name='Email'
-                    required={true}
+                    required={false}
                 />
                 <Button label={buttonLabel} />
             </form>
@@ -165,27 +166,31 @@ const { tag, title, subtitle, inputPlaceholder, buttonLabel, backgroundImage, su
         align-items: flex-end;
         gap: 8px;
         width: 100%;
-        max-width: 440px;
+        max-width: 520px;
         padding: 20px;
         position: relative;
         overflow: hidden;
     }
 
     .hero-message {
-        display: none;
+        opacity: 0;
         width: 100%;
-        max-width: 440px;
+        max-width: 520px;
         padding: 0 20px;
-        text-align: center;
+        text-align: left;
         font-family: var(--font-family-body);
         font-size: 13px;
         font-weight: 400;
         line-height: 1.4em;
-        margin-top: -12px;
+        margin-top: -24px;
+        min-height: 1.4em;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
     }
 
     .hero-message-visible {
-        display: block;
+        opacity: 1;
+        pointer-events: auto;
     }
 
     .hero-message-error {
@@ -223,7 +228,7 @@ const { tag, title, subtitle, inputPlaceholder, buttonLabel, backgroundImage, su
         left: 0;
         width: 100%;
         height: 100%;
-        opacity: 0.15;
+        opacity: 0.11;
         background-image: url('/images/noise.png');
         background-repeat: repeat;
         background-position: center top;

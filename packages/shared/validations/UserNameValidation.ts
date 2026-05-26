@@ -1,9 +1,7 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const UserNameValidation = (
-    name: string | null
-): ValidationReturnType => {
+const UserNameValidation = (name: string | null): ValidationReturnType => {
     const minLengthCase = z.string().min(2).safeParse(name)
 
     if (!minLengthCase.success)

@@ -21,7 +21,6 @@ export default tseslint.config(
             '**/expo-env.d.ts',
             '**/.astro/**',
             'app/**',
-            'api/**',
             'admin/**'
         ]
     },

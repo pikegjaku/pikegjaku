@@ -4,7 +4,7 @@ import type {
 } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const CodeNumberValidation = (
+const CodeNumberValidation = (
     code: CodeInputValueTypes
 ): ValidationReturnType => {
     const codeKeys = Object.keys(code)

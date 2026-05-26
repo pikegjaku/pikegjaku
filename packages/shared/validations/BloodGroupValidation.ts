@@ -14,9 +14,7 @@ const BloodGroupEnum = z.enum([
     BLOOD_GROUPS.O_NEGATIVE
 ])
 
-export const BloodGroupValidation = (
-    group: string | null
-): ValidationReturnType => {
+const BloodGroupValidation = (group: string | null): ValidationReturnType => {
     try {
         BloodGroupEnum.parse(group)
     } catch {

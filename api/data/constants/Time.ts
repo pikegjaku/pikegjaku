@@ -1,0 +1,1 @@
+export const TimestampFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ'

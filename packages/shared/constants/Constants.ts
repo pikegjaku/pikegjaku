@@ -18,15 +18,6 @@ export const POST_STATUSES = {
     FULFILLED: 'fulfilled'
 }
 
-export const NOTIFICATION_TYPES = {
-    EMERGENCY: 'emergency'
-}
-
-export const USER_NOTIFICATION_TYPES = {
-    NSC: 'nsc',
-    NOC: 'noc'
-}
-
 export const USER_ROLES = {
     USER: 'user',
     ADMIN: 'admin'

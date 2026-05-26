@@ -1,7 +1,7 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const PostDescriptionValidation = (
+const PostDescriptionValidation = (
     description: string
 ): ValidationReturnType => {
     const minLengthCase = z.string().min(32).safeParse(description)

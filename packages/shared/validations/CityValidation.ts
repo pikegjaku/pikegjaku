@@ -1,5 +1,5 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
-export const CityValidation = (
+const CityValidation = (
     city: string | null,
     cities: Array<string>
 ): ValidationReturnType => {

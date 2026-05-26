@@ -1,7 +1,7 @@
 import type { PostTypes, ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const CityNameValidation = (type: PostTypes): ValidationReturnType => {
+const CityNameValidation = (type: PostTypes): ValidationReturnType => {
     const cityName = z.string()
     const minLengthCase = cityName.min(2)
     const maxLengthCase = cityName.max(64)
