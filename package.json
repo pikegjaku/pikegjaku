@@ -63,14 +63,12 @@
         "typescript-eslint": "^8.57.2"
     },
     "dependencies": {
-        "@expo/config-plugins": "^55.0.7"
+        "@expo/config-plugins": "^55.0.7",
+        "zod": "^4.3.6"
     },
     "overrides": {
         "react": "19.2.0",
         "react-dom": "19.2.0",
-        "react-native": "0.83.4",
-        "astro": {
-            "zod": "^4.3.6"
-        }
+        "react-native": "0.83.4"
     }
 }
