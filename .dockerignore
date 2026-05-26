@@ -7,4 +7,5 @@
 .DS_Store
 app
 www
+!www/package.json
 admin
