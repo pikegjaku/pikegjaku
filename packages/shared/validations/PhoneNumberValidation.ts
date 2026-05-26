@@ -7,7 +7,7 @@ const PHONE_LENGTHS: Record<string, number> = {
     MK: 8
 }
 
-export const PhoneNumberValidation = (
+const PhoneNumberValidation = (
     number: string | null,
     countryCode: string = 'XK'
 ): ValidationReturnType => {

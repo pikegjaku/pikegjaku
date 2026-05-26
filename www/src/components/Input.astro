@@ -16,6 +16,17 @@ const { placeholder, type = 'email', name, required = false } = Astro.props
             required={required}
             class='input-field'
         />
+        <svg
+            class='input-lock'
+            xmlns='http://www.w3.org/2000/svg'
+            width='16'
+            height='16'
+            viewBox='0 0 256 256'
+            fill='currentColor'
+            aria-hidden='true'
+        >
+            <path d='M208,80H176V56a48,48,0,0,0-96,0V80H48A16,16,0,0,0,32,96V208a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V96A16,16,0,0,0,208,80ZM96,56a32,32,0,0,1,64,0V80H96ZM208,208H48V96H208V208Zm-68-56a12,12,0,1,1-12-12A12,12,0,0,1,140,152Z'/>
+        </svg>
     </div>
 </label>
 
@@ -63,7 +74,8 @@ const { placeholder, type = 'email', name, required = false } = Astro.props
     }
 
     .input-field::placeholder {
-        color: var(--color-brand-text-muted);
+        color: rgba(255, 255, 255, 0.4);
+        font-weight: 300;
     }
 
     .input-field:focus {
@@ -74,5 +86,34 @@ const { placeholder, type = 'email', name, required = false } = Astro.props
         user-select: none;
         pointer-events: none;
         opacity: 0.7;
+    }
+
+    .input-field-error,
+    .input-field-error:focus {
+        border-color: var(--color-brand-red);
+    }
+
+    .input-field-locked,
+    .input-field-locked:focus {
+        cursor: default;
+        pointer-events: none;
+        padding-right: 36px;
+        color: var(--color-brand-text-muted);
+        border-color: var(--color-brand-input-border);
+    }
+
+    .input-lock {
+        position: absolute;
+        top: 50%;
+        right: 12px;
+        transform: translateY(-50%);
+        color: var(--color-brand-text-muted);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+    }
+
+    .input-lock-visible {
+        opacity: 1;
     }
 </style>

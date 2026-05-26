@@ -30,7 +30,7 @@ Pikëgjaku është një platformë komunitare që lidh dhuruesit vullnetarë të
 | --------------------- | --------------------------------------------------------------- |
 | **Aplikacioni Mobil** | React Native, Expo, Expo Router, Zustand, twrnc, Phosphor Icons |
 | **API**               | Hono.js, Bun, MongoDB (Mongoose), Cloudflare, Sharp, JWT        |
-| **Uebi**              | Astro                                                           |
+| **Uebi**              | Astro 6, Tailwind 4 (deployed to Cloudflare Pages)              |
 | **Paneli Admin**      | React, Vite                                                     |
 | **Shared**            | TypeScript, i18n, validacione, konstante, helpers               |
 
@@ -40,8 +40,8 @@ Pikëgjaku është një platformë komunitare që lidh dhuruesit vullnetarë të
 pikegjaku/
 ├── app/               # Aplikacioni mobil me React Native + Expo
 ├── api/               # Backend me Hono.js (Bun runtime)
-├── web/               # Faqja e uljes me Astro
-├── admin/             # Paneli admin me React
+├── www/               # Faqja marketing me Astro
+├── admin/             # Paneli admin me React + Vite
 ├── packages/
 │   └── shared/        # @pikegjaku/shared — konstante, helpers, validacione, i18n
 └── package.json       # Root i workspace-it
@@ -76,7 +76,7 @@ Kopjoni skedarët `.env.example` në çdo workspace dhe plotësoni vlerat e nevo
 ```bash
 cp api/.env.example api/.env
 cp app/.env.example app/.env
-cp web/.env.example web/.env
+cp www/.env.example www/.env
 ```
 
 ### 4. Nisni workspace-t
@@ -90,7 +90,7 @@ bun run api:dev
 # Aplikacioni Mobil (Expo)
 bun run app:start
 
-# Uebi (Astro)
+# Uebi (Astro, porti 2010)
 bun run www:dev
 
 # Paneli Admin (Vite)
@@ -104,6 +104,54 @@ bun run format    # Prettier + ESLint fix
 bun run lint      # ESLint check
 bun run check     # Format + lint
 ```
+
+## Faqja Marketing (www)
+
+E ndërtuar me Astro 6 + Tailwind 4, e publikuar në Cloudflare Pages.
+
+### Komandat
+
+```bash
+bun run www:dev       # Server dev (porti 2010)
+bun run www:build     # Ndërton faqen statike në www/dist
+bun run www:preview   # Parashikon faqen e ndërtuar
+bun run www:tsc       # Kontroll i tipeve
+bun run www:lint      # Lint
+```
+
+### Variablat e Mjedisit
+
+Vendosi në cilësimet e projektit në Cloudflare Pages (dhe në `www/.env` për zhvillim lokal):
+
+| Variabla            | E detyrueshme | Qëllimi                                       |
+| ------------------- | ------------- | --------------------------------------------- |
+| `PUBLIC_API_URL`    | po            | URL-ja bazë e API-së së Pikëgjakut (waitlist) |
+| `PUBLIC_GA_ID`      | jo            | ID-ja e matjes së Google Analytics            |
+| `PUBLIC_HOTJAR_ID`  | jo            | ID-ja e faqes në Hotjar (numerike)            |
+| `PUBLIC_CLARITY_ID` | jo            | ID-ja e projektit në Microsoft Clarity        |
+
+### Publikimi në Cloudflare Pages
+
+**Cilësimet e ndërtimit:**
+
+- Framework preset: **None**
+- Build command: `bun run www:build`
+- Build output directory: `www/dist`
+- Root directory: _(bosh)_
+- Environment variables: shih tabelën më lart
+
+**Routing:**
+
+- `public/_redirects` heq trailing slash-et (përputhet me `trailingSlash: 'never'` në `astro.config.mjs`).
+- `public/robots.txt` lejon crawler-at kryesorë të AI dhe motorëve të kërkimit dhe tregon sitemap-in.
+- `@astrojs/sitemap` gjeneron `sitemap-index.xml` gjatë ndërtimit.
+
+### Faqet
+
+- `/` — Faqja kryesore + regjistrim në waitlist
+- `/privatesia` — Politika e privatësisë
+- `/kushtet-e-sherbimit` — Kushtet e shërbimit
+- `/404` — Nuk u gjet
 
 ## Kontributi
 

@@ -1,0 +1,8 @@
+{
+    "editor.insertSpaces": true,
+    "javascript.format.semicolons": "remove",
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
+}

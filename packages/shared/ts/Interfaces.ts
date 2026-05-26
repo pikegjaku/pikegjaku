@@ -2,7 +2,6 @@ import type {
     BloodGroupTypes,
     PostTypes,
     PostStatusTypes,
-    NotificationTypes,
     UserRoleTypes
 } from '@pikegjaku/shared/ts/Types'
 
@@ -65,8 +64,6 @@ export interface BaseUserInterface {
     Visits: number
     BloodGroup: BloodGroupTypes
     Role: UserRoleTypes
-    NotificationsOutsideCity: boolean
-    NotificationsSameCity: boolean
     Deleted: boolean
     Deleted_At: Date | null
     Last_Active: Date
@@ -91,16 +88,4 @@ export interface BasePostInterface {
     Deleted_At: Date | null
     Created_At: Date
     Updated_At: Date
-}
-
-export interface BaseNotificationInterface {
-    _id?: string
-    User: BaseUserInterface
-    Post: BasePostInterface
-    Type: NotificationTypes
-    Read: boolean
-    Read_At: Date
-    Sent_At: Date
-    Deleted: boolean
-    Deleted_At: Date | null
 }

@@ -1,9 +1,7 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-export const AvatarValidation = (
-    avatar: string | null
-): ValidationReturnType => {
+const AvatarValidation = (avatar: string | null): ValidationReturnType => {
     const avatarCases = z.string().nullable()
 
     try {

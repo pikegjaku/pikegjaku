@@ -1,1 +1,3 @@
-export { default as Timeout } from '@pikegjaku/shared/helpers/Timeout'
+import Timeout from '@pikegjaku/shared/helpers/Timeout'
+
+export { Timeout }

@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "baseUrl": "./",
+        "strict": true,
+        "lib": ["esnext"],
+        "module": "esnext",
+        "moduleResolution": "bundler",
+        "target": "esnext",
+        "types": ["bun"],
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "isolatedModules": true,
+        "incremental": true,
+        "allowJs": true,
+        "paths": {
+            "@/*": ["./*"],
+            "@pikegjaku/shared": ["../packages/shared"],
+            "@pikegjaku/shared/*": ["../packages/shared/*"]
+        }
+    },
+    "include": ["**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+}

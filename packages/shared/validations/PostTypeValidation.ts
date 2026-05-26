@@ -5,7 +5,7 @@ import { POST_TYPES } from '@pikegjaku/shared/constants'
 
 const PostGroupEnum = z.enum([POST_TYPES.BLOOD])
 
-export const PostTypeValidation = (type: PostTypes): ValidationReturnType => {
+const PostTypeValidation = (type: PostTypes): ValidationReturnType => {
     try {
         PostGroupEnum.parse(type)
     } catch {
