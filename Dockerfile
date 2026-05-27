@@ -7,7 +7,7 @@ COPY api/package.json ./api/
 COPY www/package.json ./www/
 COPY packages/shared/package.json ./packages/shared/
 
-RUN bun install --frozen-lockfile --production --ignore-scripts
+RUN bun install
 
 FROM oven/bun:1.2-debian AS runner
 
