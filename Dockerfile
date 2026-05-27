@@ -22,6 +22,8 @@ COPY package.json bun.lock ./
 COPY api ./api
 COPY packages/shared ./packages/shared
 
+RUN echo "=== /app/api/controllers/actions:" && ls /app/api/controllers/actions && echo "=== /app/api/controllers/actions/admin:" && ls /app/api/controllers/actions/admin && echo "=== tsconfig:" && cat /app/api/tsconfig.json
+
 EXPOSE 2040
 
 WORKDIR /app/api
