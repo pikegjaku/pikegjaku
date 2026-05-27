@@ -26,8 +26,8 @@
 
 
 # temp
-app
-admin
+/app
+/admin
 
 # local scripts
 api/scripts
