@@ -17,6 +17,7 @@ ENV NODE_ENV=production
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/api/node_modules ./api/node_modules
+COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_modules
 COPY package.json bun.lock ./
 COPY api ./api
 COPY packages/shared ./packages/shared
@@ -25,4 +26,4 @@ EXPOSE 2040
 
 WORKDIR /app/api
 
-CMD ["bun", "run", "index.ts"]
+CMD ["bun", "index.ts"]
