@@ -9,6 +9,6 @@ bun.lock
 bun.lockb
 package-lock.json
 .astro
-app
+mobile
 api
 admin

@@ -4,8 +4,9 @@ WORKDIR /app
 
 COPY package.json bun.lock ./
 COPY api/package.json ./api/
-COPY www/package.json ./www/
+COPY web/package.json ./web/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/envless/package.json ./packages/envless/
 
 RUN bun install
 
@@ -21,9 +22,10 @@ COPY --from=deps /app/packages/shared/node_modules ./packages/shared/node_module
 COPY package.json bun.lock ./
 COPY api ./api
 COPY packages/shared ./packages/shared
+COPY packages/envless ./packages/envless
 
 EXPOSE 2040
 
 WORKDIR /app/api
 
-CMD ["bun", "index.ts"]
+CMD ["bun", "--env-file=/dev/null", "../packages/envless/src/Inject.ts", "--", "bun", "index.ts"]

@@ -1,4 +1,5 @@
 import { EmailValidation } from '@pikegjaku/shared/validations'
+import WithProtocol from '@/lib/WithProtocol'
 
 const form = document.getElementById('waitlist-form') as HTMLFormElement
 const input = form.querySelector('input') as HTMLInputElement
@@ -6,7 +7,7 @@ const button = form.querySelector('button') as HTMLButtonElement
 const message = document.getElementById('waitlist-message') as HTMLDivElement
 const lockIcon = form.querySelector('.input-lock') as SVGElement
 
-const API_URL = import.meta.env.PUBLIC_API_URL
+const API_URL = WithProtocol(import.meta.env.PUBLIC_API_URL)
 const t = {
     subscribed: form.dataset.subscribed || '',
     error: form.dataset.error || '',

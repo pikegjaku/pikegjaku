@@ -5,6 +5,6 @@
 **/*.log
 .git
 .DS_Store
-app/**
-www/**
-!www/package.json
+mobile/**
+web/**
+!web/package.json

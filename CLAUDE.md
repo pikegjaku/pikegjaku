@@ -2,11 +2,20 @@
 
 A TypeScript monorepo with a React Native (Expo) mobile app, a Hono.js API, and an Astro marketing site.
 
+Pikëgjaku is a volunteer blood donation platform connecting donors with people in need across Kosovo, Albania, and North Macedonia. When someone needs blood they create a request specifying the blood type and location, and matching donors nearby are notified immediately.
+
+**Features**
+
+- Urgent requests posted with blood type, location, and details
+- Smart notifications matched on blood type and proximity
+- Donation center directory with contacts and locations
+- Three countries and 30+ cities covered
+
 ## Project Structure
 
 ```
 pikegjaku-/
-├── app/               # React Native + Expo mobile app
+├── mobile/            # React Native + Expo mobile app
 │   ├── ui/            # UI layer (components, icons, illustrations, layouts, styles, views)
 │   ├── controllers/   # Data controllers (cities, countries, posts, users, etc.)
 │   ├── hooks/         # Custom React hooks
@@ -20,20 +29,23 @@ pikegjaku-/
 │   ├── data/          # Data layer (models, structures, constants, etc.)
 │   ├── scripts/       # Utility scripts
 │   └── ts/            # Centralized types (Interfaces.ts, Types.ts)
-├── www/               # Astro marketing site (deployed to Cloudflare Pages)
+├── web/               # Astro marketing site (deployed to Cloudflare Pages)
 │   ├── public/        # Static assets (_redirects, robots.txt, llms.txt, fonts, images)
 │   ├── src/           # Astro pages, components, layouts, scripts, styles
 │   └── astro.config.mjs
+├── admin/             # Vite + React admin dashboard
 ├── packages/
-│   └── shared/        # @pikegjaku/shared - constants, helpers, validations
+│   ├── shared/        # @pikegjaku/shared - constants, helpers, validations
+│   └── envless/       # @pikegjaku/envless - env injector, run as a process only
 └── package.json       # Workspace root
 ```
 
 ## Tech Stack
 
-- **App**: React Native 0.76 + Expo 52 + Expo Router + Zustand + twrnc (Tailwind) + Phosphor Icons + RNEUI
+- **Mobile**: React Native 0.83 + Expo 55 + Expo Router + Zustand + twrnc (Tailwind) + Phosphor Icons + RNEUI
 - **API**: Hono.js + Bun + Mongoose (MongoDB) + AWS S3 + Sharp + JWT
-- **WWW**: Astro 6 + Tailwind 4 + sitemap (deployed to Cloudflare Pages)
+- **Web**: Astro 6 + Tailwind 4 + sitemap (deployed to Cloudflare Pages)
+- **Admin**: React + Vite
 - **Shared**: @pikegjaku/shared - validations, helpers, constants
 
 ## Code Conventions
@@ -43,7 +55,7 @@ pikegjaku-/
 Always use `@/` path aliases. Never use `../` or `./` relative imports.
 
 ```typescript
-// CORRECT - app, api, www workspaces
+// CORRECT - mobile, api, web workspaces
 import { something } from '@/controllers/posts'
 import { MyComponent } from '@/ui/components/MyComponent'
 
@@ -107,9 +119,9 @@ Never use the shorthand `<>...</>` fragment syntax. Always use the explicit `<Fr
 
 - **API Controllers** (`api/controllers/`): Group by resource with subdirectories for actions, filters, helpers, libs, middlewares
 - **API Routes** (`api/router/`): One file per resource, import controllers and wire to Hono routes
-- **App Views** (`app/ui/views/`): One component per view/screen
-- **App Components** (`app/ui/components/`): Reusable UI components
-- **App Hooks** (`app/hooks/`): One hook per file
+- **Mobile Views** (`mobile/ui/views/`): One component per view/screen
+- **Mobile Components** (`mobile/ui/components/`): Reusable UI components
+- **Mobile Hooks** (`mobile/hooks/`): One hook per file
 
 ### Naming Conventions
 
@@ -123,7 +135,7 @@ Never use the shorthand `<>...</>` fragment syntax. Always use the explicit `<Fr
 Enforced by ESLint 9 flat config (`eslint.config.js` at root) + Prettier (`.prettierrc` at root). Pre-commit hook runs both via Husky.
 
 **Prettier**: single quotes, no semicolons, 4-space indent, no trailing commas, single JSX quotes
-**ESLint**: same as above plus no-multiple-empty-lines (max 1), eol-last never, no-empty (allow empty catch), consistent-type-imports, no-unused-vars (warn), no-explicit-any (warn), react-hooks rules for app/
+**ESLint**: same as above plus no-multiple-empty-lines (max 1), eol-last never, no-empty (allow empty catch), consistent-type-imports, no-unused-vars (warn), no-explicit-any (warn), react-hooks rules for mobile/
 
 **Commands**: `bun run format` (Prettier + ESLint fix), `bun run lint` (ESLint check), `bun run check` (format + lint)
 
@@ -137,16 +149,81 @@ All input validation length limits must be defined in `packages/shared/validatio
 
 ### Scripts & Running
 
-All scripts are defined in the **root** `package.json` and must be run from the project root. Never add or modify scripts in workspace `package.json` files (`api/package.json`, `app/package.json`, etc.).
+All scripts are defined in the **root** `package.json` and must be run from the project root. Never add or modify scripts in workspace `package.json` files (`api/package.json`, `mobile/package.json`, etc.).
 
-- `bun run api:dev` — Start API dev server (port 9999)
-- `bun run api:build` — Build API
-- `bun run api:start` — Start API production server (port 9999)
-- `bun run app:start` — Start Expo dev server
-- `bun run www:dev` — Start www dev server
+Every script that runs an app goes through the Envless injector, so its environment comes from the feed. There is no non-injected variant.
+
+- `bun run api:dev` / `api:build` / `api:start` / `api:seed` — API (port 2040)
+- `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` — Expo
+- `bun run web:dev` / `web:build` / `web:preview` — web
+- `bun run admin:dev` / `admin:build` / `admin:preview` — admin
+- `bun run <workspace>:exec -- <command>` — run anything with that workspace's feed injected
+- `bun run <workspace>:diff` — compare the feed against that workspace's `.env`
 - `bun run format` / `bun run lint` / `bun run check` — Formatting & linting
 
-When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `app:test`).
+Type checks, linters and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
+
+When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `mobile:test`), and wrap anything that reads environment variables in the injector.
+
+### Prerequisites & Setup
+
+- Node.js v22.12+ (pinned in `.nvmrc`, required by Astro 6)
+- Bun (for the API)
+- Expo CLI
+
+Every value comes from Envless. There are no `.env.example` files and no local secrets: each workspace's `.env` holds exactly two lines pointing at that workspace's feed, and nothing else.
+
+```bash
+bun install
+```
+
+```
+ENVLESS_VERSION_LINK=https://api.envless.cloud/exposed/<workspace>/<product>/<project>/<environment>/versions/latest
+ENVLESS_PASSPHRASE=<workspace passphrase>
+```
+
+Put those two lines in `api/.env`, `web/.env`, `admin/.env` and `mobile/.env`, each pointing at its own environment. See `packages/envless/README.md` for the rest.
+
+### Web Deployment (Cloudflare Pages)
+
+**Build settings**
+
+- Framework preset: None
+- Build command: `bun run web:build`
+- Build output directory: `web/dist`
+- Root directory: empty
+- Node version: `.nvmrc` pins 22.12.0, the minimum Astro 6 accepts
+
+**Environment variables**: Cloudflare Pages holds only `ENVLESS_VERSION_LINK` and `ENVLESS_PASSPHRASE`, pointed at the web production environment. `web:build` runs through the injector, so everything below is decrypted from the feed at build time and inlined into the bundle. Local development reads the same two lines from `web/.env`.
+
+| Variable            | Required | Purpose                                              |
+| ------------------- | -------- | ---------------------------------------------------- |
+| `PUBLIC_API_URL`    | yes      | Base URL of the Pikëgjaku API, used for the waitlist |
+| `PUBLIC_GA_ID`      | no       | Google Analytics measurement ID                      |
+| `PUBLIC_HOTJAR_ID`  | no       | Hotjar site ID (numeric)                             |
+| `PUBLIC_CLARITY_ID` | no       | Microsoft Clarity project ID                         |
+
+**Routing**
+
+- `public/_redirects` strips trailing slashes, matching `trailingSlash: 'never'` in `astro.config.mjs`
+- `public/robots.txt` allows the major AI and search crawlers and points to the sitemap
+- `@astrojs/sitemap` generates `sitemap-index.xml` at build time
+
+**Pages**: `/` (home + waitlist signup), `/privatesia` (privacy policy), `/kushtet-e-sherbimit` (terms of service), `/404`.
+
+**Other web commands**: `bun run web:preview` (preview the built site), `bun run web:tsc` (type check), `bun run web:lint`, `bun run web:build`.
+
+### Contributing
+
+Contributions are welcome. Before opening a PR:
+
+1. Follow the existing code conventions
+2. Use `@/` path aliases, never relative imports
+3. Centralize types in `@/ts/`
+4. Write user-facing text as direct Albanian string literals
+5. Run `bun run check`
+
+Licensed MIT, see [LICENSE](LICENSE).
 
 ## Guidelines for AI
 
@@ -165,6 +242,6 @@ When adding new scripts, always add them to the root `package.json` following th
 13. No section markers — never write `// Section Name` or `{/* Section */}` comments
 14. Strict formatting — 4-space indent, single quotes, no semicolons, no trailing commas
 15. Full cleanup on feature removal — delete ALL related code across the entire codebase
-16. Phosphor icons only — never use inline SVGs for icons. Use `phosphor-react-native` (duotone) in `app/`, `@phosphor-icons/react` (duotone) in `admin/` and `www/`
+16. Phosphor icons only — never use inline SVGs for icons. Use `phosphor-react-native` (duotone) in `mobile/`, `@phosphor-icons/react` (duotone) in `admin/` and `web/`
 17. Use Zustand persist middleware for user preferences
 18. Use camelCase for SVG attributes in JSX
