@@ -46,6 +46,14 @@
         "zod": "^3.23.8",
       },
     },
+    "packages/envless": {
+      "name": "@pikegjaku/envless",
+      "version": "0.0.1",
+      "devDependencies": {
+        "@types/bun": "^1.1.10",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/shared": {
       "name": "@pikegjaku/shared",
       "version": "0.0.1",
@@ -53,8 +61,8 @@
         "zod": "^3.23.8",
       },
     },
-    "www": {
-      "name": "@pikegjaku/www",
+    "web": {
+      "name": "@pikegjaku/web",
       "dependencies": {
         "@astrojs/sitemap": "^3.7.2",
         "@phosphor-icons/core": "^2.1.1",
@@ -404,9 +412,11 @@
 
     "@phosphor-icons/core": ["@phosphor-icons/core@2.1.1", "", {}, "sha512-v4ARvrip4qBCImOE5rmPUylOEK4iiED9ZyKjcvzuezqMaiRASCHKcRIuvvxL/twvLpkfnEODCOJp5dM4eZilxQ=="],
 
+    "@pikegjaku/envless": ["@pikegjaku/envless@workspace:packages/envless"],
+
     "@pikegjaku/shared": ["@pikegjaku/shared@workspace:packages/shared"],
 
-    "@pikegjaku/www": ["@pikegjaku/www@workspace:www"],
+    "@pikegjaku/web": ["@pikegjaku/web@workspace:web"],
 
     "@rollup/pluginutils": ["@rollup/pluginutils@5.3.0", "", { "dependencies": { "@types/estree": "^1.0.0", "estree-walker": "^2.0.2", "picomatch": "^4.0.2" }, "peerDependencies": { "rollup": "^1.20.0||^2.0.0||^3.0.0||^4.0.0" }, "optionalPeers": ["rollup"] }, "sha512-5EdhGZtnu3V88ces7s53hhfK5KSASnJZv8Lulpc04cWO3REESroJXg73DFsOmgbU2BhwV0E20bu2IDZb3VKW4Q=="],
 

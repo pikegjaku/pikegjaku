@@ -20,7 +20,7 @@ export default tseslint.config(
             '**/.api/**',
             '**/expo-env.d.ts',
             '**/.astro/**',
-            'app/**',
+            'mobile/**',
             'admin/**'
         ]
     },
@@ -59,7 +59,7 @@ export default tseslint.config(
         }
     },
     {
-        files: ['app/**/*.{ts,tsx}', 'admin/**/*.{ts,tsx}'],
+        files: ['mobile/**/*.{ts,tsx}', 'admin/**/*.{ts,tsx}'],
         plugins: {
             'react-hooks': reactHooks
         },
