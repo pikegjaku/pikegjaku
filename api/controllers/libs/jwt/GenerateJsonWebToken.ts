@@ -1,7 +1,7 @@
 import type { StringValue } from 'ms'
 
 import { sign } from 'jsonwebtoken'
-import { AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET } from '@/data/constants'
+import { env } from '@goenvless/env/server'
 
 const GenerateJsonWebToken = async (
     userId: string,
@@ -9,7 +9,7 @@ const GenerateJsonWebToken = async (
     mode: 'access' | 'refresh'
 ) => {
     const secret =
-        mode === 'access' ? AUTH_ACCESS_TOKEN_SECRET : AUTH_REFRESH_TOKEN_SECRET
+        mode === 'access' ? env.AUTH_ACCESS_TOKEN_SECRET : env.AUTH_REFRESH_TOKEN_SECRET
 
     return sign({ userId }, secret, { expiresIn })
 }

@@ -35,8 +35,7 @@ pikegjaku-/
 │   └── astro.config.mjs
 ├── admin/             # Vite + React admin dashboard
 ├── packages/
-│   ├── shared/        # @pikegjaku/shared - constants, helpers, validations
-│   └── envless/       # @pikegjaku/envless - env injector, run as a process only
+│   └── shared/        # @pikegjaku/shared - constants, helpers, validations
 └── package.json       # Workspace root
 ```
 
@@ -151,19 +150,18 @@ All input validation length limits must be defined in `packages/shared/validatio
 
 All scripts are defined in the **root** `package.json` and must be run from the project root. Never add or modify scripts in workspace `package.json` files (`api/package.json`, `mobile/package.json`, etc.).
 
-Every script that runs an app goes through the Envless injector, so its environment comes from the feed. There is no non-injected variant.
+Every script that runs an app goes through `envless run --workspace bfzli --product pikegjaku --project <project> --env <env>`, so its environment is decrypted in memory from Envless. There is no non-wrapped variant.
 
-- `bun run api:dev` / `api:build` / `api:start` / `api:seed` — API (port 2040)
-- `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` — Expo
-- `bun run web:dev` / `web:build` / `web:preview` — web
-- `bun run admin:dev` / `admin:build` / `admin:preview` — admin
-- `bun run <workspace>:exec -- <command>` — run anything with that workspace's feed injected
-- `bun run <workspace>:diff` — compare the feed against that workspace's `.env`
+- `bun run api:dev` / `api:build` / `api:start` / `api:seed` — API (port 1111 locally, 2040 in the container)
+- `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` / `mobile:run:android` / `mobile:run:ios` — Expo (Metro on 3333)
+- `bun run web:dev` / `web:build` / `web:preview` — web (2222)
+- `bun run admin:dev` / `admin:build` / `admin:preview` — admin (5555)
+- `bun run <workspace>:exec -- <command>` — run anything with that workspace's variables
 - `bun run format` / `bun run lint` / `bun run check` — Formatting & linting
 
 Type checks, linters and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
 
-When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `mobile:test`), and wrap anything that reads environment variables in the injector.
+When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `mobile:test`), and wrap anything that reads environment variables in `envless run`.
 
 ### Prerequisites & Setup
 
@@ -171,18 +169,14 @@ When adding new scripts, always add them to the root `package.json` following th
 - Bun (for the API)
 - Expo CLI
 
-Every value comes from Envless. There are no `.env.example` files and no local secrets: each workspace's `.env` holds exactly two lines pointing at that workspace's feed, and nothing else.
+Every value comes from Envless. There are no `.env` files, no `.env.example` files and no local secrets. Code never falls back to a default: a variable the code reads exists in Envless, and a variable nothing reads is removed from Envless. The server's `ENV` is `local` or `prod`.
 
 ```bash
 bun install
+bunx envless login
 ```
 
-```
-ENVLESS_VERSION_LINK=https://api.envless.cloud/exposed/<workspace>/<product>/<project>/<environment>/versions/latest
-ENVLESS_PASSPHRASE=<workspace passphrase>
-```
-
-Put those two lines in `api/.env`, `web/.env`, `admin/.env` and `mobile/.env`, each pointing at its own environment. See `packages/envless/README.md` for the rest.
+After one `envless login` on the machine, every script resolves its variables itself. Anywhere a person cannot log in (CI, a container, Cloudflare Pages) set two variables instead: `ENVLESS_TOKEN`, an `ev_sk_` API key that authenticates, and `ENVLESS_KEY`, the workspace key that decrypts (Envless dashboard, CI / Machine Access). `ENVLESS_PASSPHRASE` works in place of `ENVLESS_KEY`.
 
 ### Web Deployment (Cloudflare Pages)
 
@@ -194,7 +188,7 @@ Put those two lines in `api/.env`, `web/.env`, `admin/.env` and `mobile/.env`, e
 - Root directory: empty
 - Node version: `.nvmrc` pins 22.12.0, the minimum Astro 6 accepts
 
-**Environment variables**: Cloudflare Pages holds only `ENVLESS_VERSION_LINK` and `ENVLESS_PASSPHRASE`, pointed at the web production environment. `web:build` runs through the injector, so everything below is decrypted from the feed at build time and inlined into the bundle. Local development reads the same two lines from `web/.env`.
+**Environment variables**: Cloudflare Pages holds only `ENVLESS_TOKEN` and `ENVLESS_KEY`. `web:build` runs `envless run --env prod` for the web project, so everything below is decrypted at build time and inlined into the bundle. Local development uses the machine's `envless login` instead.
 
 | Variable            | Required | Purpose                                              |
 | ------------------- | -------- | ---------------------------------------------------- |

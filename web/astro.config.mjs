@@ -8,9 +8,6 @@ export default defineConfig({
     devToolbar: {
         enabled: false
     },
-    server: {
-        port: parseInt(process.env.PORT || '4321')
-    },
     integrations: [sitemap()],
     vite: {
         plugins: [tailwindcss()]
