@@ -1,16 +1,16 @@
 import { Resend } from 'resend'
-import { RESEND_API_KEY, RESEND_SEGMENT_ID } from '@/data/constants'
+import { env } from '@goenvless/env/server'
 
 const CreateContact = async (email: string): Promise<boolean> => {
     try {
-        const resend = new Resend(RESEND_API_KEY)
+        const resend = new Resend(env.RESEND_API_KEY)
 
         const response = await resend.contacts.create({
             email,
             unsubscribed: false,
             segments: [
                 {
-                    id: RESEND_SEGMENT_ID
+                    id: env.RESEND_SEGMENT_ID
                 }
             ]
         })

@@ -22,6 +22,6 @@
             "@pikegjaku/shared/*": ["../packages/shared/*"]
         }
     },
-    "include": ["**/*.ts"],
+    "include": ["envless-env.d.ts", "**/*.ts"],
     "exclude": ["node_modules", "dist"]
 }

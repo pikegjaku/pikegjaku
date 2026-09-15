@@ -1,0 +1,18 @@
+procs:
+    'api 1111':
+        shell: npm run api:dev
+        cwd: <CONFIG_DIR>
+        stop: SIGINT
+    'web 2222':
+        shell: npm run web:dev
+        cwd: <CONFIG_DIR>
+        stop: SIGINT
+    'admin 5555':
+        shell: npm run admin:dev
+        cwd: <CONFIG_DIR>
+        stop: SIGINT
+    'mobile 3333':
+        shell: npm run mobile:start
+        cwd: <CONFIG_DIR>
+        stop: SIGINT
+        autostart: false

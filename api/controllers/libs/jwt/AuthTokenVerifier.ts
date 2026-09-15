@@ -2,11 +2,12 @@ import type { Context } from 'hono'
 import type { AuthTokenVerifierFunctionResponseTypes } from '@/ts'
 
 import { deleteCookie } from 'hono/cookie'
+import { env } from '@goenvless/env/server'
 import { GenerateJsonWebToken, VerifyJwtToken } from '@/controllers/libs/jwt'
 import { TokenExpiredError } from 'jsonwebtoken'
 import { Console } from '@/controllers/helpers/logs'
 
-import { AUTH_ACCESS_TOKEN_SECRET, AUTH_REFRESH_TOKEN_SECRET, COOKIE_ACCESSORS } from '@/data/constants'
+import { COOKIE_ACCESSORS } from '@/data/constants'
 
 const AuthTokenVerifier = async (
     c: Context
@@ -24,8 +25,8 @@ const AuthTokenVerifier = async (
                 message: 'Tokeni nuk u përfshin në krye sepse kjo rrugë kërkon autentikim.'
             }
         else {
-            const access_secret = AUTH_ACCESS_TOKEN_SECRET as string
-            const refresh_secret = AUTH_REFRESH_TOKEN_SECRET as string
+            const access_secret = env.AUTH_ACCESS_TOKEN_SECRET as string
+            const refresh_secret = env.AUTH_REFRESH_TOKEN_SECRET as string
 
             let response: AuthTokenVerifierFunctionResponseTypes = {
                 code: 401,

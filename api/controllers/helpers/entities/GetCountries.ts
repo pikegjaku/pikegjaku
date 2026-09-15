@@ -1,14 +1,15 @@
 import type { CountryInterface } from '@/ts'
 
+import { env } from '@goenvless/env/server'
 import { CountryModel } from '@/data/models'
 import { CountryListSelector } from '@/data/constants/Selectors'
-import { CACHE_TTL, ENV, ENVIRONMENTS } from '@/data/constants'
+import { CACHE_TTL, ENVIRONMENTS } from '@/data/constants'
 
 let cache: Array<CountryInterface> | null = null
 let cachedAt = 0
 
 const GetCountries = async (): Promise<Array<CountryInterface>> => {
-    if (ENV === ENVIRONMENTS.PROD) {
+    if (env.ENV === ENVIRONMENTS.PROD) {
         if (cache && Date.now() - cachedAt < CACHE_TTL) return cache
 
         const countries = await CountryModel.find({ Deleted: { $ne: true } })

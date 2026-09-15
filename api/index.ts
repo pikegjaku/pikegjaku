@@ -2,6 +2,7 @@ import type { Handler } from 'hono'
 import type { RouteAuthLevel } from '@/ts'
 
 import { Hono } from 'hono'
+import { env } from '@goenvless/env/server'
 import { GlobalMiddlewares } from '@/controllers/helpers/api'
 import { CatchAll } from '@/controllers/helpers/router'
 import { AdminMiddleware, AuthMiddleware } from '@/controllers/middlewares'
@@ -48,6 +49,6 @@ const InitInstance = () => {
 const App = InitInstance()
 
 export default {
-    port: Number(process.env.PORT) || 9999,
+    port: Number(env.PORT),
     fetch: App.fetch
 }
