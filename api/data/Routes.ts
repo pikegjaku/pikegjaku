@@ -79,7 +79,7 @@ const ROUTES: RouteDefinition[] = [
 
     { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'db', handler: ListCities },
 
-    { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'public', handler: JoinWaitlist },
+    { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'db', handler: JoinWaitlist },
 
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.STATS, auth: 'admin', handler: Stats },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.LIST_USERS, auth: 'admin', handler: ListUsers },

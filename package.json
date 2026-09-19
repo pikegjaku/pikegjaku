@@ -30,7 +30,7 @@
         "web:build": "cd web && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project web --env prod -- bunx astro build",
         "web:preview": "cd web && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project web --env local -- bunx astro preview --port 2222",
         "web:exec": "cd web && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project web --env local --",
-        "web:tsc": "cd web && tsc --noEmit",
+        "web:tsc": "cd web && bunx astro sync && tsc --noEmit",
         "web:lint": "cd web && eslint .",
         "web:lint:fix": "cd web && eslint . --fix",
         "admin:dev": "cd admin && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project admin --env local -- bunx vite dev",

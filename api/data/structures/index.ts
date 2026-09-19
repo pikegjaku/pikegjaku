@@ -4,6 +4,7 @@ import CountryStructure from '@/data/structures/CountryStructure'
 import PostStructure from '@/data/structures/PostStructure'
 import UserStructure from '@/data/structures/UserStructure'
 import VerificationStructure from '@/data/structures/VerificationStructure'
+import WaitlistStructure from '@/data/structures/WaitlistStructure'
 
 export {
     CenterStructure,
@@ -11,5 +12,6 @@ export {
     CountryStructure,
     PostStructure,
     UserStructure,
-    VerificationStructure
+    VerificationStructure,
+    WaitlistStructure
 }

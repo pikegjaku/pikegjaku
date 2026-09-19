@@ -44,3 +44,12 @@ export interface VerificationInterface {
         MessageId: string
     }
 }
+
+export interface WaitlistInterface {
+    _id: string
+    Email: string
+    Subscribed_At: Date
+    Metadata: {
+        EmailId: string
+    }
+}

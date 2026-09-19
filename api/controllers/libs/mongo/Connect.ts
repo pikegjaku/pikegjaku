@@ -13,7 +13,7 @@ const Connect = async (_: Context | null, next: Next | null): Promise<void> => {
 
     if (mongoose.connection.readyState === 0) {
         mongoose.set('strictQuery', true)
-        await mongoose.connect(env.MONGO_URI, MONGO_OPTIONS)
+        await mongoose.connect(env.DATABASE_URL, MONGO_OPTIONS)
     }
 
     if (next) await next()

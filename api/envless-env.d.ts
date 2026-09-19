@@ -9,15 +9,14 @@ declare global {
             CLOUDFLARE_ACCESS_KEY_ID: string
             CLOUDFLARE_S3_EU_ENDPOINT: string
             CLOUDFLARE_SECRET_ACCESS_KEY: string
-            CLOUDFLARE_TOKEN_VALUE: string
+            DATABASE_URL: string
             ENV: string
-            HOST: string
-            MONGO_URI: string
-            ONESIGNAL_API_KEY: string
-            ONESIGNAL_APP_ID: string
-            ONESIGNAL_REST_API_URL: string
+            OPENEMAIL_ADMIN: string
+            OPENEMAIL_API_KEY: string
+            OPENEMAIL_FROM: string
             ORIGINS: string
             PORT: string
+            POSTGRES_URI: string
             RESEND_API_KEY: string
             RESEND_SEGMENT_ID: string
             SENT_API_KEY: string
@@ -33,15 +32,14 @@ declare module '@goenvless/env/server' {
         CLOUDFLARE_ACCESS_KEY_ID: string
         CLOUDFLARE_S3_EU_ENDPOINT: string
         CLOUDFLARE_SECRET_ACCESS_KEY: string
-        CLOUDFLARE_TOKEN_VALUE: string
+        DATABASE_URL: string
         ENV: string
-        HOST: string
-        MONGO_URI: string
-        ONESIGNAL_API_KEY: string
-        ONESIGNAL_APP_ID: string
-        ONESIGNAL_REST_API_URL: string
+        OPENEMAIL_ADMIN: string
+        OPENEMAIL_API_KEY: string
+        OPENEMAIL_FROM: string
         ORIGINS: string
         PORT: string
+        POSTGRES_URI: string
         RESEND_API_KEY: string
         RESEND_SEGMENT_ID: string
         SENT_API_KEY: string

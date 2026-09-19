@@ -13,7 +13,8 @@ import type {
     CountryInterface,
     UserInterface,
     PostInterface,
-    VerificationInterface
+    VerificationInterface,
+    WaitlistInterface
 } from '@/ts'
 
 import type {
@@ -88,6 +89,7 @@ export type Models =
     | UserInterface
     | PostInterface
     | VerificationInterface
+    | WaitlistInterface
 
 export type UploadToBucketFunctionProps = {
     bucket: string
@@ -113,3 +115,15 @@ export type HandleAvatarInput = {
 export type HandleAvatarResult =
     | { ok: true; changed: boolean; path: string | null }
     | { ok: false; code: StatusCode; message: string }
+
+export type EmailLayoutProps = {
+    preheader: string
+    heading: string
+    body: string
+}
+
+export type NotificationTemplateProps = {
+    email: string
+    total: number
+    date: string
+}

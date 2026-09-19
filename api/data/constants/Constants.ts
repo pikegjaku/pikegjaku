@@ -4,6 +4,15 @@ export const MAX_AVATAR_BYTES = 10 * 1024 * 1024
 export const DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/
 export const CACHE_TTL = 3600 * 1000
 
+export const RESERVED_EMAIL_DOMAINS = [
+    'example.com',
+    'example.net',
+    'example.org',
+    'test',
+    'invalid',
+    'localhost'
+]
+
 export const MONGO_OPTIONS = {
     maxPoolSize: 100,
     minPoolSize: 10,
@@ -18,6 +27,36 @@ export const MONGO_OPTIONS = {
     compressors: ['zlib' as const],
     autoIndex: false
 }
+
+export const BRAND = {
+    RED: '#f44336',
+    BLACK: '#000000',
+    SURFACE: '#0a0a0a',
+    BORDER: '#1f1f1f',
+    TEXT: '#ffffff',
+    TEXT_MUTED: '#8c8c8c',
+    SITE: 'https://pikegjaku.com',
+    HEADING_FONT: "'Host Grotesk', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+    BODY_FONT: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+}
+
+export const WAITLIST_DATE_FORMAT: Intl.DateTimeFormatOptions = {
+    dateStyle: 'long',
+    timeStyle: 'short',
+    timeZone: 'Europe/Belgrade'
+}
+
+export const LOGO_PIXELS: [number, number][] = [
+    [3, 0],
+    [2, 1], [3, 1], [4, 1],
+    [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
+    [1, 3], [2, 3], [3, 3], [4, 3], [5, 3],
+    [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4],
+    [0, 5], [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5],
+    [0, 6], [1, 6], [2, 6], [3, 6], [4, 6], [5, 6], [6, 6],
+    [1, 7], [2, 7], [3, 7], [4, 7], [5, 7],
+    [2, 8], [3, 8], [4, 8]
+]
 
 export const EXTERNAL_APIS = {
     SENT: {
@@ -97,7 +136,8 @@ export const MODELS = {
     VERIFICATION: 'Verification',
     COUNTRY: 'Country',
     CENTER: 'Center',
-    CITY: 'City'
+    CITY: 'City',
+    WAITLIST: 'Waitlist'
 }
 
 export const POPULATE = {

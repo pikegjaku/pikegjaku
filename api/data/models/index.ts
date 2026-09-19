@@ -4,6 +4,7 @@ import CountryModel from '@/data/models/CountryModel'
 import PostModel from '@/data/models/PostModel'
 import UserModel from '@/data/models/UserModel'
 import VerificationModel from '@/data/models/VerificationModel'
+import WaitlistModel from '@/data/models/WaitlistModel'
 
 export {
     CenterModel,
@@ -11,5 +12,6 @@ export {
     CountryModel,
     PostModel,
     UserModel,
-    VerificationModel
+    VerificationModel,
+    WaitlistModel
 }
