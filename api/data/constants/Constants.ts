@@ -40,6 +40,8 @@ export const BRAND = {
     BODY_FONT: "'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Helvetica, Arial, sans-serif"
 }
 
+export const WAITLIST_WELCOME_RETRY_MS = 60 * 1000
+
 export const WAITLIST_DATE_FORMAT: Intl.DateTimeFormatOptions = {
     dateStyle: 'long',
     timeStyle: 'short',

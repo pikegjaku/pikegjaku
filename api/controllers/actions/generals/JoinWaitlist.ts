@@ -7,8 +7,12 @@ import {
     SendWelcomeEmail
 } from '@/controllers/libs/openemail'
 import { Console } from '@/controllers/helpers/logs'
+import { IsReservedEmail } from '@/controllers/helpers/generals'
 import { CurrentTimestamp } from '@/data/dates'
-import { WAITLIST_DATE_FORMAT } from '@/data/constants'
+import {
+    WAITLIST_DATE_FORMAT,
+    WAITLIST_WELCOME_RETRY_MS
+} from '@/data/constants'
 import { EmailValidation } from '@pikegjaku/shared/validations'
 
 const JoinWaitlist = async (c: Context) => {
@@ -21,7 +25,7 @@ const JoinWaitlist = async (c: Context) => {
 
         const validation = EmailValidation(normalized)
 
-        if (validation.error)
+        if (validation.error || IsReservedEmail(normalized))
             return await HttpResponder({
                 c,
                 success: false,
@@ -30,7 +34,7 @@ const JoinWaitlist = async (c: Context) => {
                 message: 'Email nuk është i vlefshëm.'
             })
 
-        const result = await WaitlistModel.updateOne(
+        const result = await WaitlistModel.findOneAndUpdate(
             { Email: normalized },
             {
                 $setOnInsert: {
@@ -38,27 +42,46 @@ const JoinWaitlist = async (c: Context) => {
                     Subscribed_At: CurrentTimestamp()
                 }
             },
-            { upsert: true }
+            { upsert: true, new: false, includeResultMetadata: true }
         )
 
-        if (result.upsertedCount > 0) {
-            const total = await WaitlistModel.countDocuments()
+        const previous = result.value
+        const inserted = !previous
+        const welcomed = Boolean(previous?.Metadata?.EmailId)
 
-            const date = new Intl.DateTimeFormat(
-                'sq-AL',
-                WAITLIST_DATE_FORMAT
-            ).format(new Date())
+        const retryable =
+            !previous ||
+            Date.now() - new Date(previous.Subscribed_At).getTime() >
+                WAITLIST_WELCOME_RETRY_MS
 
-            const [messageId] = await Promise.all([
-                SendWelcomeEmail(normalized),
-                SendSignupNotification({ email: normalized, total, date })
-            ])
+        try {
+            if (!welcomed && retryable) {
+                const total = await WaitlistModel.countDocuments()
 
-            if (typeof messageId === 'string')
-                await WaitlistModel.updateOne(
-                    { Email: normalized },
-                    { $set: { 'Metadata.EmailId': messageId } }
-                )
+                const date = new Intl.DateTimeFormat(
+                    'sq-AL',
+                    WAITLIST_DATE_FORMAT
+                ).format(new Date())
+
+                const [messageId] = await Promise.all([
+                    SendWelcomeEmail(normalized),
+                    inserted
+                        ? SendSignupNotification({
+                              email: normalized,
+                              total,
+                              date
+                          })
+                        : false
+                ])
+
+                if (typeof messageId === 'string')
+                    await WaitlistModel.updateOne(
+                        { Email: normalized },
+                        { $set: { 'Metadata.EmailId': messageId } }
+                    )
+            }
+        } catch (error) {
+            Console.Error('JoinWaitlist', error)
         }
 
         return await HttpResponder({

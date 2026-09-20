@@ -13,8 +13,7 @@ const ApiCors = async (c: Context, next: Next) => {
         allowHeaders: ['*'],
         allowMethods: ['*'],
         exposeHeaders: ['*'],
-        maxAge: 600,
-        credentials: true
+        maxAge: 600
     })
 
     return await corsMiddleware(c, next)

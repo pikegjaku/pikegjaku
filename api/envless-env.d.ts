@@ -16,9 +16,6 @@ declare global {
             OPENEMAIL_FROM: string
             ORIGINS: string
             PORT: string
-            POSTGRES_URI: string
-            RESEND_API_KEY: string
-            RESEND_SEGMENT_ID: string
             SENT_API_KEY: string
             SENT_TEMPLATE_ID: string
         }
@@ -39,9 +36,6 @@ declare module '@goenvless/env/server' {
         OPENEMAIL_FROM: string
         ORIGINS: string
         PORT: string
-        POSTGRES_URI: string
-        RESEND_API_KEY: string
-        RESEND_SEGMENT_ID: string
         SENT_API_KEY: string
         SENT_TEMPLATE_ID: string
     }
