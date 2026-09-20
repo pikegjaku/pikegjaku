@@ -181,16 +181,3 @@ export const FILE_TYPES = {
         WEBP: 'image/webp'
     }
 }
-
-export const OS_TYPES = {
-    WINDOWS: 'Windows',
-    LINUX: 'Linux',
-    MAC: 'Mac'
-}
-
-export const BROWSER_TYPES = {
-    CHROME: 'Chrome',
-    FIREFOX: 'Firefox',
-    SAFARI: 'Safari',
-    EDGE: 'Edge'
-}

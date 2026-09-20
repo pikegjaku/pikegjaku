@@ -17,20 +17,13 @@ import type {
     WaitlistInterface
 } from '@/ts'
 
-import type {
-    BROWSER_TYPES,
-    MODELS,
-    OS_TYPES,
-    VERFICATIONS_TYPES
-} from '@/data/constants'
+import type { MODELS, VERFICATIONS_TYPES } from '@/data/constants'
 
 export type RouteAuthLevel = 'public' | 'db' | 'user' | 'admin'
 
 export type VerificationTypes =
     (typeof VERFICATIONS_TYPES)[keyof typeof VERFICATIONS_TYPES]
 export type ModelTypes = (typeof MODELS)[keyof typeof MODELS]
-export type OsTypes = (typeof OS_TYPES)[keyof typeof OS_TYPES]
-export type BrowserTypes = (typeof BROWSER_TYPES)[keyof typeof BROWSER_TYPES]
 
 export type HttpResponderFunctionProps = {
     c: Context
