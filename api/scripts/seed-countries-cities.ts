@@ -1,3 +1,6 @@
+import type { QueryFilter } from 'mongoose'
+import type { CityInterface } from '@/ts'
+
 import mongoose from 'mongoose'
 import { env } from '@goenvless/env/server'
 import { CityModel, CountryModel } from '@/data/models'
@@ -54,7 +57,7 @@ const Run = async () => {
         const total = await CityModel.countDocuments({
             Country: country._id,
             Deleted: { $ne: true }
-        })
+        } as QueryFilter<CityInterface>)
 
         await CountryModel.updateOne(
             { _id: country._id },

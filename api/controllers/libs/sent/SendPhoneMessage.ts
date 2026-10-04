@@ -1,6 +1,6 @@
 import type { SentMessagesResponse } from '@/ts'
 
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 import Console from '@/controllers/helpers/logs/Console'
 import { ENVIRONMENTS, EXTERNAL_APIS } from '@/data/constants'
 

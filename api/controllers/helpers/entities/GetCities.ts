@@ -1,6 +1,6 @@
 import type { CityInterface } from '@/ts'
 
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 import { CityModel } from '@/data/models'
 import { CityListSelector } from '@/data/constants/Selectors'
 import { CACHE_TTL, ENVIRONMENTS } from '@/data/constants'

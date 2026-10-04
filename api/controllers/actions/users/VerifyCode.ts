@@ -1,4 +1,6 @@
 import type { Context } from 'hono'
+import type { QueryFilter } from 'mongoose'
+import type { VerificationInterface } from '@/ts'
 
 import { UserModel, VerificationModel } from '@/data/models'
 import { HttpResponder } from '@/controllers/helpers/http'
@@ -23,7 +25,7 @@ const VerifyCode = async (c: Context) => {
         if (user) {
             const verification = await VerificationModel.findOne({
                 User: user?._id
-            })
+            } as QueryFilter<VerificationInterface>)
 
             if (verification) {
                 const { Code, Expired, Attempts, Used, Expires_At } =
@@ -97,7 +99,7 @@ const VerifyCode = async (c: Context) => {
 
                     const { User } = verification
 
-                    const userId = (User?._id || User) as string
+                    const userId = String(User?._id || User)
 
                     const [token, refresh] = await Promise.all([
                         GenerateJsonWebToken(userId, '10m', 'access'),

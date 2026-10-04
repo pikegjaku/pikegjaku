@@ -1,23 +1,21 @@
 import type { VerifyJwtTokenReturnType } from '@/ts'
 
-import { verify } from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
+import { JWT_ALGORITHM } from '@/data/constants'
 
-const VerifyJwtToken = (
+const VerifyJwtToken = async (
     token: string,
     secret: string
 ): Promise<VerifyJwtTokenReturnType> => {
-    return new Promise((resolve, reject) => {
-        verify(token, secret, (err, decoded) => {
-            if (err) reject(err)
-            else if (
-                decoded &&
-                typeof decoded !== 'string' &&
-                'userId' in decoded
-            )
-                resolve(decoded as VerifyJwtTokenReturnType)
-            else reject(new Error())
-        })
-    })
+    const { payload } = await jwtVerify(
+        token,
+        new TextEncoder().encode(secret),
+        { algorithms: [JWT_ALGORITHM] }
+    )
+
+    if ('userId' in payload) return payload as VerifyJwtTokenReturnType
+
+    throw new Error()
 }
 
 export default VerifyJwtToken

@@ -6,16 +6,12 @@ declare global {
         interface ProcessEnv {
             AUTH_ACCESS_TOKEN_SECRET: string
             AUTH_REFRESH_TOKEN_SECRET: string
-            CLOUDFLARE_ACCESS_KEY_ID: string
-            CLOUDFLARE_S3_EU_ENDPOINT: string
-            CLOUDFLARE_SECRET_ACCESS_KEY: string
             DATABASE_URL: string
             ENV: string
             OPENEMAIL_ADMIN: string
             OPENEMAIL_API_KEY: string
             OPENEMAIL_FROM: string
             ORIGINS: string
-            PORT: string
             SENT_API_KEY: string
             SENT_TEMPLATE_ID: string
         }
@@ -26,16 +22,12 @@ declare module '@goenvless/env/server' {
     interface EnvlessServerEnv {
         AUTH_ACCESS_TOKEN_SECRET: string
         AUTH_REFRESH_TOKEN_SECRET: string
-        CLOUDFLARE_ACCESS_KEY_ID: string
-        CLOUDFLARE_S3_EU_ENDPOINT: string
-        CLOUDFLARE_SECRET_ACCESS_KEY: string
         DATABASE_URL: string
         ENV: string
         OPENEMAIL_ADMIN: string
         OPENEMAIL_API_KEY: string
         OPENEMAIL_FROM: string
         ORIGINS: string
-        PORT: string
         SENT_API_KEY: string
         SENT_TEMPLATE_ID: string
     }

@@ -4,6 +4,7 @@
 **/.expo
 **/.next
 **/.astro
+**/.wrangler
 **/*.tsbuildinfo
 **/dist
 **/web-build

@@ -1,6 +1,6 @@
 import type { CountryInterface } from '@/ts'
 
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 import { CountryModel } from '@/data/models'
 import { CountryListSelector } from '@/data/constants/Selectors'
 import { CACHE_TTL, ENVIRONMENTS } from '@/data/constants'

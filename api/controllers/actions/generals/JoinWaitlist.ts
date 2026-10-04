@@ -42,7 +42,11 @@ const JoinWaitlist = async (c: Context) => {
                     Subscribed_At: CurrentTimestamp()
                 }
             },
-            { upsert: true, new: false, includeResultMetadata: true }
+            {
+                upsert: true,
+                returnDocument: 'before',
+                includeResultMetadata: true
+            }
         )
 
         const previous = result.value

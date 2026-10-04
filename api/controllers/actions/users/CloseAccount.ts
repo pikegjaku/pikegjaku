@@ -1,4 +1,6 @@
 import type { Context } from 'hono'
+import type { QueryFilter } from 'mongoose'
+import type { CityInterface, CountryInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CalculateTime, CurrentTimestamp } from '@/data/dates'
@@ -36,7 +38,7 @@ const CloseAccount = async (c: Context) => {
 
                 for (const post of posts) {
                     await CountryModel.updateOne(
-                        { _id: post.Country },
+                        { _id: post.Country } as QueryFilter<CountryInterface>,
                         {
                             $inc: {
                                 Posts: -1
@@ -48,7 +50,7 @@ const CloseAccount = async (c: Context) => {
                     )
 
                     await CityModel.updateOne(
-                        { _id: post.City },
+                        { _id: post.City } as QueryFilter<CityInterface>,
                         {
                             $inc: {
                                 Posts: -1

@@ -23,9 +23,9 @@ pikegjaku-/
 │   ├── helpers/       # Helper functions
 │   ├── ts/            # Centralized types (Interfaces.ts, Types.ts)
 │   └── data/          # Static data
-├── api/               # Hono.js backend (Bun runtime)
+├── api/               # Hono.js backend (Cloudflare Workers + Durable Object)
 │   ├── controllers/   # Business logic (actions, filters, helpers, libs, middlewares)
-│   ├── router/        # Route definitions
+│   ├── router/        # Hono app wiring the routes to their middlewares
 │   ├── data/          # Data layer (models, structures, constants, etc.)
 │   ├── scripts/       # Utility scripts
 │   └── ts/            # Centralized types (Interfaces.ts, Types.ts)
@@ -42,7 +42,7 @@ pikegjaku-/
 ## Tech Stack
 
 - **Mobile**: React Native 0.83 + Expo 55 + Expo Router + Zustand + twrnc (Tailwind) + Phosphor Icons + RNEUI
-- **API**: Hono.js + Bun + Mongoose (MongoDB) + AWS S3 + Sharp + JWT
+- **API**: Hono.js + Cloudflare Workers (Durable Object) + Mongoose 9 (MongoDB) + R2 + Cloudflare Images + jose (JWT)
 - **Web**: Astro 6 + Tailwind 4 + sitemap (deployed to Cloudflare Pages)
 - **Admin**: React + Vite
 - **Shared**: @pikegjaku/shared - validations, helpers, constants
@@ -152,21 +152,21 @@ All scripts are defined in the **root** `package.json` and must be run from the 
 
 Every script that runs an app goes through `envless run --workspace bfzli --product pikegjaku --project <project> --env <env>`, so its environment is decrypted in memory from Envless. There is no non-wrapped variant.
 
-- `bun run api:dev` / `api:build` / `api:start` / `api:seed` — API (port 1111 locally, 2040 in the container)
+- `bun run api:dev` / `api:deploy` / `api:seed` / `api:indexes` — API (`wrangler dev` on 1111, deployed to Cloudflare Workers)
 - `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` / `mobile:run:android` / `mobile:run:ios` — Expo (Metro on 3333)
 - `bun run web:dev` / `web:build` / `web:preview` — web (2222)
 - `bun run admin:dev` / `admin:build` / `admin:preview` — admin (5555)
 - `bun run <workspace>:exec -- <command>` — run anything with that workspace's variables
 - `bun run format` / `bun run lint` / `bun run check` — Formatting & linting
 
-Type checks, linters and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
+Type checks, linters, `api:build` (a `wrangler deploy --dry-run` bundle), `api:types` and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
 
 When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `mobile:test`), and wrap anything that reads environment variables in `envless run`.
 
 ### Prerequisites & Setup
 
 - Node.js v22.12+ (pinned in `.nvmrc`, required by Astro 6)
-- Bun (for the API)
+- Bun 1.4+ (runs the API scripts)
 - Expo CLI
 
 Every value comes from Envless. There are no `.env` files, no `.env.example` files and no local secrets. Code never falls back to a default: a variable the code reads exists in Envless, and a variable nothing reads is removed from Envless. The server's `ENV` is `local` or `prod`.
@@ -206,6 +206,22 @@ After one `envless login` on the machine, every script resolves its variables it
 **Pages**: `/` (home + waitlist signup), `/privatesia` (privacy policy), `/kushtet-e-sherbimit` (terms of service), `/404`.
 
 **Other web commands**: `bun run web:preview` (preview the built site), `bun run web:tsc` (type check), `bun run web:lint`, `bun run web:build`.
+
+### API Deployment (Cloudflare Workers)
+
+The API runs on Cloudflare Workers, configured in `api/wrangler.json`. The Worker in `api/index.ts` forwards every request to one Durable Object, `Server`, which runs the Hono app from `api/router/` and keeps the MongoDB connection pool open between requests (a plain Worker cannot reuse a socket across requests). `SERVER_LOCATION` in `api/data/constants/Constants.ts` places that object close to the database, so keep it in the region of the cluster. The object's name is the region, so changing it starts a fresh object there.
+
+**Bindings**
+
+| Binding  | Resource                                      | Used for                    |
+| -------- | --------------------------------------------- | --------------------------- |
+| `SERVER` | Durable Object `Server`                       | Runs the API, owns the pool |
+| `CDN`    | R2 bucket `pikegjaku-cdn` (`eu` jurisdiction) | Avatars                     |
+| `IMAGES` | Cloudflare Images                             | Resizing avatars to WebP    |
+
+**Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
+
+**Deploying**: run `bunx wrangler login` once (in CI set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` instead), then `bun run api:deploy`. The API hostname is attached to the `pikegjaku-api` Worker as a Custom Domain (Workers & Pages → pikegjaku-api → Settings → Domains & Routes). Logs are in Workers Logs.
 
 ### Contributing
 

@@ -1,0 +1,54 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "name": "pikegjaku-api",
+    "main": "index.ts",
+    "compatibility_date": "2026-10-01",
+    "minify": true,
+    "upload_source_maps": true,
+    "observability": {
+        "enabled": true
+    },
+    "dev": {
+        "ip": "0.0.0.0",
+        "port": 1111,
+        "generate_types": true
+    },
+    "durable_objects": {
+        "bindings": [
+            {
+                "name": "SERVER",
+                "class_name": "Server"
+            }
+        ]
+    },
+    "migrations": [
+        {
+            "tag": "v1",
+            "new_sqlite_classes": ["Server"]
+        }
+    ],
+    "r2_buckets": [
+        {
+            "binding": "CDN",
+            "bucket_name": "pikegjaku-cdn",
+            "jurisdiction": "eu"
+        }
+    ],
+    "images": {
+        "binding": "IMAGES"
+    },
+    "secrets": {
+        "required": [
+            "AUTH_ACCESS_TOKEN_SECRET",
+            "AUTH_REFRESH_TOKEN_SECRET",
+            "DATABASE_URL",
+            "ENV",
+            "OPENEMAIL_ADMIN",
+            "OPENEMAIL_API_KEY",
+            "OPENEMAIL_FROM",
+            "ORIGINS",
+            "SENT_API_KEY",
+            "SENT_TEMPLATE_ID"
+        ]
+    }
+}

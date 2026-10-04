@@ -1,5 +1,5 @@
 import { OpenEmail } from '@openemail/sdk'
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 
 let client: OpenEmail | null = null
 

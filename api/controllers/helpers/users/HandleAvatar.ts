@@ -1,11 +1,10 @@
 import type { HandleAvatarInput, HandleAvatarResult } from '@/ts'
 
-import sharp from 'sharp'
-
+import { env } from 'cloudflare:workers'
 import { DeleteFile, UploadToBucket } from '@/controllers/libs/cloudflare'
+import { Console } from '@/controllers/helpers/logs'
 
 import {
-    CLOUDFLARE_BUCKETS,
     CLOUDFLARE_CDN_PATHS,
     DATA_URI_PATTERN,
     FILE_EXTENSIONS,
@@ -31,7 +30,7 @@ const HandleAvatar = async ({
     if (incomingAvatar === null) {
         if (!currentAvatar) return { ok: true, changed: false, path: null }
 
-        const deleted = await DeleteFile(path, CLOUDFLARE_BUCKETS.CDN)
+        const deleted = await DeleteFile(path)
 
         if (!deleted)
             return {
@@ -46,7 +45,7 @@ const HandleAvatar = async ({
     const match = incomingAvatar.match(DATA_URI_PATTERN)
     const base64 = match ? match[1] : incomingAvatar
 
-    let buffer: Buffer
+    let buffer: Buffer<ArrayBuffer>
 
     try {
         buffer = Buffer.from(base64, 'base64')
@@ -75,16 +74,17 @@ const HandleAvatar = async ({
         }
     }
 
-    if (currentAvatar) await DeleteFile(path, CLOUDFLARE_BUCKETS.CDN)
-
-    let processed: Buffer
+    let processed: ArrayBuffer
 
     try {
-        processed = await sharp(buffer)
-            .resize(250, 250)
-            .webp({ quality: 50 })
-            .toBuffer()
-    } catch {
+        const output = await env.IMAGES.input(new Blob([buffer]).stream())
+            .transform({ width: 250, height: 250, fit: 'cover' })
+            .output({ format: FILE_TYPES.IMAGE.WEBP, quality: 50 })
+
+        processed = await output.response().arrayBuffer()
+    } catch (error) {
+        Console.Error('HandleAvatar', error)
+
         return {
             ok: false,
             code: 400,
@@ -93,11 +93,9 @@ const HandleAvatar = async ({
     }
 
     const uploaded = await UploadToBucket({
-        bucket: CLOUDFLARE_BUCKETS.CDN,
         path,
         file: processed,
-        type: FILE_TYPES.IMAGE.WEBP,
-        publicObject: true
+        type: FILE_TYPES.IMAGE.WEBP
     })
 
     if (!uploaded)
