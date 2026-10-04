@@ -46,9 +46,33 @@ export const BRAND = {
 export const WAITLIST_WELCOME_RETRY_MS = 60 * 1000
 
 export const WAITLIST_DATE_FORMAT: Intl.DateTimeFormatOptions = {
-    dateStyle: 'long',
-    timeStyle: 'short',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
     timeZone: 'Europe/Belgrade'
+}
+
+export const MONTH_NAMES = [
+    'janar',
+    'shkurt',
+    'mars',
+    'prill',
+    'maj',
+    'qershor',
+    'korrik',
+    'gusht',
+    'shtator',
+    'tetor',
+    'nëntor',
+    'dhjetor'
+]
+
+export const DAY_PERIODS: Record<string, string> = {
+    AM: 'e paradites',
+    PM: 'e pasdites'
 }
 
 export const LOGO_PIXELS: [number, number][] = [

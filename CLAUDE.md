@@ -221,6 +221,8 @@ The API runs on Cloudflare Workers, configured in `api/wrangler.json`. The Worke
 
 **Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
 
+**Database**: the Worker reaches MongoDB over the public internet from no fixed IP, so the cluster's access list must allow `0.0.0.0/0`. It needs MongoDB 4.4 or newer and either no TLS or a publicly trusted certificate, because Workers support neither `tlsCAFile` nor `tlsInsecure`/`tlsAllowInvalidCertificates`. Workers also ship no Albanian locale data, so Albanian dates are formatted by `FormatDate` instead of `Intl`.
+
 **Deploying**: run `bunx wrangler login` once (in CI set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` instead), then `bun run api:deploy`. The API hostname is attached to the `pikegjaku-api` Worker as a Custom Domain (Workers & Pages → pikegjaku-api → Settings → Domains & Routes). Logs are in Workers Logs.
 
 ### Contributing

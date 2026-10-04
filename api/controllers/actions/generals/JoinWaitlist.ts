@@ -8,11 +8,8 @@ import {
 } from '@/controllers/libs/openemail'
 import { Console } from '@/controllers/helpers/logs'
 import { IsReservedEmail } from '@/controllers/helpers/generals'
-import { CurrentTimestamp } from '@/data/dates'
-import {
-    WAITLIST_DATE_FORMAT,
-    WAITLIST_WELCOME_RETRY_MS
-} from '@/data/constants'
+import { CurrentTimestamp, FormatDate } from '@/data/dates'
+import { WAITLIST_WELCOME_RETRY_MS } from '@/data/constants'
 import { EmailValidation } from '@pikegjaku/shared/validations'
 
 const JoinWaitlist = async (c: Context) => {
@@ -62,10 +59,7 @@ const JoinWaitlist = async (c: Context) => {
             if (!welcomed && retryable) {
                 const total = await WaitlistModel.countDocuments()
 
-                const date = new Intl.DateTimeFormat(
-                    'sq-AL',
-                    WAITLIST_DATE_FORMAT
-                ).format(new Date())
+                const date = FormatDate(new Date())
 
                 const [messageId] = await Promise.all([
                     SendWelcomeEmail(normalized),
