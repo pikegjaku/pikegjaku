@@ -1,6 +1,7 @@
 export const MAX_ENTITY_ITEMS = 50
 export const DEFAULT_TEST_NUMBER = '00000000'
 export const MAX_AVATAR_BYTES = 10 * 1024 * 1024
+export const MAX_REQUEST_BYTES = 20 * 1024 * 1024
 export const DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/
 export const CACHE_TTL = 3600 * 1000
 
@@ -14,8 +15,8 @@ export const RESERVED_EMAIL_DOMAINS = [
 ]
 
 export const MONGO_OPTIONS = {
-    maxPoolSize: 100,
-    minPoolSize: 10,
+    maxPoolSize: 20,
+    minPoolSize: 2,
     maxIdleTimeMS: 30000,
     serverSelectionTimeoutMS: 10000,
     socketTimeoutMS: 45000,
@@ -27,6 +28,8 @@ export const MONGO_OPTIONS = {
     compressors: ['zlib' as const],
     autoIndex: false
 }
+
+export const SERVER_LOCATION = 'weur' as const
 
 export const BRAND = {
     RED: '#f44336',
@@ -43,9 +46,33 @@ export const BRAND = {
 export const WAITLIST_WELCOME_RETRY_MS = 60 * 1000
 
 export const WAITLIST_DATE_FORMAT: Intl.DateTimeFormatOptions = {
-    dateStyle: 'long',
-    timeStyle: 'short',
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
     timeZone: 'Europe/Belgrade'
+}
+
+export const MONTH_NAMES = [
+    'janar',
+    'shkurt',
+    'mars',
+    'prill',
+    'maj',
+    'qershor',
+    'korrik',
+    'gusht',
+    'shtator',
+    'tetor',
+    'nëntor',
+    'dhjetor'
+]
+
+export const DAY_PERIODS: Record<string, string> = {
+    AM: 'e paradites',
+    PM: 'e pasdites'
 }
 
 export const LOGO_PIXELS: [number, number][] = [
@@ -154,6 +181,8 @@ export const VERFICATIONS_TYPES = {
     PHONE: 'phone'
 }
 
+export const JWT_ALGORITHM = 'HS256'
+
 export const COOKIE_ACCESSORS = {
     ACCESS: 'a_token',
     REFRESH: 'r_token'
@@ -162,10 +191,6 @@ export const COOKIE_ACCESSORS = {
 export const ENVIRONMENTS = {
     LOCAL: 'local',
     PROD: 'prod'
-}
-
-export const CLOUDFLARE_BUCKETS = {
-    CDN: 'pikegjaku-cdn'
 }
 
 export const CLOUDFLARE_CDN_PATHS = {
@@ -178,6 +203,6 @@ export const FILE_EXTENSIONS = {
 
 export const FILE_TYPES = {
     IMAGE: {
-        WEBP: 'image/webp'
+        WEBP: 'image/webp' as const
     }
 }

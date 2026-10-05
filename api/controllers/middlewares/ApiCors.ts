@@ -1,7 +1,7 @@
 import type { Context, Next } from 'hono'
 
 import { cors } from 'hono/cors'
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 import { ENVIRONMENTS } from '@/data/constants'
 
 const ApiCors = async (c: Context, next: Next) => {

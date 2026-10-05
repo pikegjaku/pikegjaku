@@ -1,4 +1,4 @@
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
 import Client from '@/controllers/libs/openemail/Client'
 import WelcomeTemplate from '@/controllers/libs/openemail/templates/WelcomeTemplate'
 import Console from '@/controllers/helpers/logs/Console'

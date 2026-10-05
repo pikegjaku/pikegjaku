@@ -85,11 +85,9 @@ export type Models =
     | WaitlistInterface
 
 export type UploadToBucketFunctionProps = {
-    bucket: string
     path: string
-    file: Buffer
+    file: ArrayBuffer
     type: string
-    publicObject: boolean
 }
 
 export type SentMessagesResponse = {

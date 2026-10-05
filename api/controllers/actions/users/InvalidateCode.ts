@@ -1,4 +1,6 @@
 import type { Context } from 'hono'
+import type { QueryFilter } from 'mongoose'
+import type { VerificationInterface } from '@/ts'
 
 import { UserModel, VerificationModel } from '@/data/models'
 import { HttpResponder } from '@/controllers/helpers/http'
@@ -20,7 +22,7 @@ const InvalidateCode = async (c: Context) => {
         if (user) {
             const verification = await VerificationModel.findOne({
                 User: user?._id
-            })
+            } as QueryFilter<VerificationInterface>)
 
             if (verification) {
                 await verification.deleteOne()

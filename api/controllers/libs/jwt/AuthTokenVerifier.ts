@@ -2,9 +2,9 @@ import type { Context } from 'hono'
 import type { AuthTokenVerifierFunctionResponseTypes } from '@/ts'
 
 import { deleteCookie } from 'hono/cookie'
-import { env } from '@goenvless/env/server'
+import { env } from 'cloudflare:workers'
+import { errors } from 'jose'
 import { GenerateJsonWebToken, VerifyJwtToken } from '@/controllers/libs/jwt'
-import { TokenExpiredError } from 'jsonwebtoken'
 import { Console } from '@/controllers/helpers/logs'
 
 import { COOKIE_ACCESSORS } from '@/data/constants'
@@ -61,7 +61,7 @@ const AuthTokenVerifier = async (
                     message: 'Tokeni i përdoruesit u verifikua.'
                 })
             } catch (err) {
-                if (err instanceof TokenExpiredError) {
+                if (err instanceof errors.JWTExpired) {
                     try {
                         const { userId } = await VerifyJwtToken(
                             token_refresh,
@@ -89,7 +89,7 @@ const AuthTokenVerifier = async (
                             })
                         }
                     } catch (err) {
-                        if (err instanceof TokenExpiredError) {
+                        if (err instanceof errors.JWTExpired) {
                             deleteCookie(c, COOKIE_ACCESSORS.ACCESS)
                             deleteCookie(c, COOKIE_ACCESSORS.REFRESH)
 

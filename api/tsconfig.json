@@ -6,7 +6,7 @@
         "module": "esnext",
         "moduleResolution": "bundler",
         "target": "esnext",
-        "types": ["bun"],
+        "types": ["node"],
         "noUnusedLocals": false,
         "noUnusedParameters": false,
         "noEmit": true,
@@ -22,6 +22,6 @@
             "@pikegjaku/shared/*": ["../packages/shared/*"]
         }
     },
-    "include": ["envless-env.d.ts", "**/*.ts"],
-    "exclude": ["node_modules", "dist"]
+    "include": ["envless-env.d.ts", "worker-configuration.d.ts", "**/*.ts"],
+    "exclude": ["node_modules", "dist", ".wrangler"]
 }

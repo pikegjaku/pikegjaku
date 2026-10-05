@@ -1,6 +1,6 @@
 import type { Context } from 'hono'
-import type { UserInterface } from '@/ts'
-import type { Document } from 'mongoose'
+import type { UserInterface, VerificationInterface } from '@/ts'
+import type { Document, QueryFilter } from 'mongoose'
 
 import { VerificationModel } from '@/data/models'
 import { HttpResponder } from '@/controllers/helpers/http'
@@ -45,7 +45,9 @@ const StartPhoneVerification = async (
             const phoneFormated = phoneNumber.replace('+', '')?.trim()
 
             if (code) {
-                await VerificationModel.deleteMany({ User: user._id })
+                await VerificationModel.deleteMany({
+                    User: user._id
+                } as QueryFilter<VerificationInterface>)
 
                 const verificationObject = {
                     Phone: phoneNumber,
@@ -55,8 +57,9 @@ const StartPhoneVerification = async (
                     Generated_At: CurrentTimestamp()
                 }
 
-                const verification =
-                    await VerificationModel.create(verificationObject)
+                const verification = await VerificationModel.create(
+                    verificationObject as unknown as Partial<VerificationInterface>
+                )
 
                 if (verification) {
                     const id = await SendPhoneMessage(

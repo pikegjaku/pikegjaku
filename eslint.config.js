@@ -19,6 +19,8 @@ export default tseslint.config(
             '**/*.config.cjs',
             '**/.api/**',
             '**/expo-env.d.ts',
+            '**/worker-configuration.d.ts',
+            '**/.wrangler/**',
             '**/.astro/**',
             'mobile/**',
             'admin/**'
