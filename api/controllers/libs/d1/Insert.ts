@@ -1,6 +1,6 @@
 import type { TableDefinition } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import MapRow from '@/controllers/libs/d1/MapRow'
 import NewId from '@/controllers/libs/d1/NewId'
 import ToColumn from '@/controllers/libs/d1/ToColumn'
@@ -19,7 +19,7 @@ const Insert = async <T>(
         (column) => column in table.columns && record[column] !== undefined
     )
 
-    const row = await env.DB.prepare(
+    const row = await Database().prepare(
         `INSERT INTO ${table.name} (${columns.join(', ')}) VALUES (${columns.map(() => '?').join(', ')})${conflict ? ` ON CONFLICT (${conflict}) DO NOTHING` : ''} RETURNING *`
     )
         .bind(

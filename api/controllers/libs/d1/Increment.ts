@@ -1,6 +1,6 @@
 import type { TableDefinition } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import Bind from '@/controllers/libs/d1/Bind'
 import ToColumn from '@/controllers/libs/d1/ToColumn'
 
@@ -20,7 +20,7 @@ const Increment = async (
         ...columns.map((key) => `${key} = ?`)
     ]
 
-    await env.DB.prepare(
+    await Database().prepare(
         `UPDATE ${table.name} SET ${assignments.join(', ')} WHERE _id = ?`
     )
         .bind(

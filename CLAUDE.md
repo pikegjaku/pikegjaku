@@ -210,17 +210,19 @@ After one `envless login` on the machine, every script resolves its variables it
 
 ### API Deployment (Cloudflare Workers)
 
-The API runs on Cloudflare Workers, configured in `api/wrangler.json`. `api/index.ts` serves the Hono app from `api/router/`, and every route reads and writes the D1 database `pikegjaku` through the helpers in `api/controllers/libs/d1/` (`Find`, `FindOne`, `Count`, `Insert`, `Update`, `Increment`, `Remove`, `Exists`, `Query`). `references` on `Find` and `FindOne` replaces an id column with the row it points to, so a post comes back with its user, city and country nested inside it.
+The API runs on Cloudflare Workers, configured in `api/wrangler.json`. `api/index.ts` serves the Hono app from `api/router/`, and every route reads and writes the D1 database `pikegjaku-db` through the helpers in `api/controllers/libs/d1/` (`Find`, `FindOne`, `Count`, `Insert`, `Update`, `Increment`, `Remove`, `Exists`, `Query`). `references` on `Find` and `FindOne` replaces an id column with the row it points to, so a post comes back with its user, city and country nested inside it.
 
 **Bindings**
 
-| Binding  | Resource                                    | Used for                                    |
-| -------- | ------------------------------------------- | ------------------------------------------- |
-| `DB`     | D1 database `pikegjaku` (`eu` jurisdiction) | All API data                                |
-| `CDN`    | R2 bucket `pikegjaku-prod`                  | Avatars, served at `cdn-prod.pikegjaku.com` |
-| `IMAGES` | Cloudflare Images                           | Resizing avatars to WebP                    |
+| Binding  | Resource                   | Used for                                    |
+| -------- | -------------------------- | ------------------------------------------- |
+| `DB`     | D1 database `pikegjaku-db` | All API data                                |
+| `CDN`    | R2 bucket `pikegjaku-prod` | Avatars, served at `cdn-prod.pikegjaku.com` |
+| `IMAGES` | Cloudflare Images          | Resizing avatars to WebP                    |
 
 In `api:dev` the `CDN` binding is remote and points at the `pikegjaku-dev` bucket, so avatars uploaded while developing land in the real dev bucket and show at `cdn-dev.pikegjaku.com`, which is the `EXPO_PUBLIC_CDN_URL` of the mobile `local` environment. That remote binding needs `bunx wrangler login` once on the machine.
+
+**Read replication**: `pikegjaku-db` keeps its primary in Eastern Europe and has read replication on, so D1 serves reads from a copy near the user anywhere in the world. Every request runs in a D1 session opened by the `DatabaseSession` middleware, so all queries of one request see each other's writes. Routes marked `replica: true` in `api/data/Routes.ts` (the feed, a single post, countries and cities) may start on the nearest replica; every other route starts on the primary, so sign-up, verification and writes never read stale data. Every response carries an `x-d1-bookmark` header, and a client that sends it back on its next request reads data at least that fresh from any replica. The database has no jurisdiction, because a jurisdiction keeps replicas inside it.
 
 **Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
 

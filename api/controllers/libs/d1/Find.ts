@@ -1,6 +1,6 @@
 import type { FindOptions, TableDefinition } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import Bind from '@/controllers/libs/d1/Bind'
 import MapRow from '@/controllers/libs/d1/MapRow'
 import Populate from '@/controllers/libs/d1/Populate'
@@ -28,7 +28,7 @@ const Find = async <T>(
         .filter(Boolean)
         .join(' ')
 
-    const { results } = await env.DB.prepare(statement)
+    const { results } = await Database().prepare(statement)
         .bind(...params.map(Bind), ...(paged ? bounds : []))
         .all<Record<string, unknown>>()
 

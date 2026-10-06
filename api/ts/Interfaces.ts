@@ -18,6 +18,7 @@ export interface RouteDefinition {
     path: string
     auth: RouteAuthLevel
     handler: Handler
+    replica?: boolean
 }
 
 export interface UserInterface extends BaseUserInterface {

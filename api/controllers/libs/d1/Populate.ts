@@ -1,6 +1,6 @@
 import type { TableReferences } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import MapRow from '@/controllers/libs/d1/MapRow'
 import { MAX_BOUND_PARAMETERS } from '@/data/constants'
 
@@ -30,7 +30,7 @@ const Populate = async (
             const rows = (
                 await Promise.all(
                     chunks.map(async (chunk) => {
-                        const { results } = await env.DB.prepare(
+                        const { results } = await Database().prepare(
                             `SELECT * FROM ${table.name} WHERE _id IN (${chunk.map(() => '?').join(', ')})`
                         )
                             .bind(...chunk)

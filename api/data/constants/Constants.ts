@@ -4,6 +4,8 @@ export const MAX_REQUEST_BYTES = 20 * 1024 * 1024
 export const DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/
 export const CACHE_TTL = 3600 * 1000
 export const MAX_BOUND_PARAMETERS = 100
+export const D1_BOOKMARK_HEADER = 'x-d1-bookmark'
+export const D1_BOOKMARK_PATTERN = /^[0-9a-f-]{8,256}$/i
 
 export const BOOLEAN_TRUE_VALUES: Array<unknown> = [true, 'true', 1, '1', 'yes']
 export const BOOLEAN_FALSE_VALUES: Array<unknown> = [false, 'false', 0, '0', 'no']

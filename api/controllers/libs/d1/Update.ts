@@ -1,6 +1,6 @@
 import type { TableDefinition } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import Bind from '@/controllers/libs/d1/Bind'
 import ToColumn from '@/controllers/libs/d1/ToColumn'
 
@@ -18,7 +18,7 @@ const Update = async (
 
     if (columns.length === 0) return
 
-    await env.DB.prepare(
+    await Database().prepare(
         `UPDATE ${table.name} SET ${columns.map((column) => `${column} = ?`).join(', ')} WHERE _id = ?`
     )
         .bind(

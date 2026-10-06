@@ -37,8 +37,8 @@
     "d1_databases": [
         {
             "binding": "DB",
-            "database_name": "pikegjaku",
-            "database_id": "cb5e4395-4840-46e8-802c-251d30ff737a",
+            "database_name": "pikegjaku-db",
+            "database_id": "ee21b65a-24f8-44bf-954d-16bb67c1c1f2",
             "migrations_dir": "migrations"
         }
     ],

@@ -4,7 +4,11 @@ import type { RouteAuthLevel } from '@/ts'
 import { Hono } from 'hono'
 import { GlobalMiddlewares } from '@/controllers/helpers/api'
 import { CatchAll } from '@/controllers/helpers/router'
-import { AdminMiddleware, AuthMiddleware } from '@/controllers/middlewares'
+import {
+    AdminMiddleware,
+    AuthMiddleware,
+    DatabaseSession
+} from '@/controllers/middlewares'
 import ROUTES from '@/data/Routes'
 
 const MIDDLEWARE_STACK: Record<RouteAuthLevel, Handler[]> = {
@@ -27,6 +31,7 @@ const InitInstance = () => {
         for (const route of ROUTES) {
             if (route.group !== group) continue
             const chain = [
+                DatabaseSession(Boolean(route.replica)),
                 ...MIDDLEWARE_STACK[route.auth],
                 route.handler
             ] as unknown as [Handler, ...Handler[]]

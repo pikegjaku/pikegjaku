@@ -71,13 +71,13 @@ const ROUTES: RouteDefinition[] = [
 
     { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.CREATE_POST, auth: 'user', handler: CreatePost },
     { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.DELETE_POST, auth: 'user', handler: DeletePost },
-    { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.LIST_POSTS, auth: 'user', handler: ListPosts },
+    { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.LIST_POSTS, auth: 'user', handler: ListPosts, replica: true },
     { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.UPDATE_POST, auth: 'user', handler: UpdatePost },
-    { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.LIST_POST, auth: 'user', handler: ListPost },
+    { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.LIST_POST, auth: 'user', handler: ListPost, replica: true },
 
-    { group: GROUP_ROUTES.COUNTRIES, path: COUNTRIES_ROUTES.LIST_COUNTRIES, auth: 'public', handler: ListCountries },
+    { group: GROUP_ROUTES.COUNTRIES, path: COUNTRIES_ROUTES.LIST_COUNTRIES, auth: 'public', handler: ListCountries, replica: true },
 
-    { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'public', handler: ListCities },
+    { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'public', handler: ListCities, replica: true },
 
     { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'public', handler: JoinWaitlist },
 

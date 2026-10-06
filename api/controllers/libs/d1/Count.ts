@@ -1,13 +1,13 @@
 import type { CountRow, SqlFilter, TableDefinition } from '@/ts'
 
-import { env } from 'cloudflare:workers'
+import Database from '@/controllers/libs/d1/Database'
 import Bind from '@/controllers/libs/d1/Bind'
 
 const Count = async (
     table: TableDefinition,
     filter?: SqlFilter
 ): Promise<number> => {
-    const row = await env.DB.prepare(
+    const row = await Database().prepare(
         `SELECT COUNT(*) AS count FROM ${table.name}${filter?.where ? ` WHERE ${filter.where}` : ''}`
     )
         .bind(...(filter?.params ?? []).map(Bind))

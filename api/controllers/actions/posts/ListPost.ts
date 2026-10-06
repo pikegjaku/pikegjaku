@@ -1,7 +1,7 @@
 import type { Context } from 'hono'
 import type { PostInterface } from '@/ts'
 
-import { FindOne, Update } from '@/controllers/libs/d1'
+import { FindOne, Increment } from '@/controllers/libs/d1'
 import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
@@ -25,7 +25,7 @@ const ListPost = async (c: Context) => {
 
             if (post) {
                 post.Views = post.Views + 1
-                await Update(PostsTable, post._id, { Views: post.Views })
+                await Increment(PostsTable, post._id, 'Views', 1)
 
                 return await HttpResponder({
                     c,
