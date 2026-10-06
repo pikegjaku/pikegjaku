@@ -7,8 +7,8 @@
     "upload_source_maps": true,
     "routes": [
         {
-            "pattern": "api.pikegjaku.com",
-            "custom_domain": true
+            "pattern": "api.pikegjaku.com/*",
+            "zone_name": "pikegjaku.com"
         }
     ],
     "workers_dev": false,
