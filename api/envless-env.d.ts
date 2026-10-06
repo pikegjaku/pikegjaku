@@ -6,7 +6,6 @@ declare global {
         interface ProcessEnv {
             AUTH_ACCESS_TOKEN_SECRET: string
             AUTH_REFRESH_TOKEN_SECRET: string
-            DATABASE_URL: string
             ENV: string
             OPENEMAIL_ADMIN: string
             OPENEMAIL_API_KEY: string
@@ -22,7 +21,6 @@ declare module '@goenvless/env/server' {
     interface EnvlessServerEnv {
         AUTH_ACCESS_TOKEN_SECRET: string
         AUTH_REFRESH_TOKEN_SECRET: string
-        DATABASE_URL: string
         ENV: string
         OPENEMAIL_ADMIN: string
         OPENEMAIL_API_KEY: string
