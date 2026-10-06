@@ -98,14 +98,16 @@ const VerifyCode = async (c: Context) => {
                     user.CompletedRegistration = true
                     user.Updated_At = CurrentTimestamp()
 
-                    await Update(VerificationsTable, verification._id, {
-                        Used: verification.Used,
-                        Expired: verification.Expired
-                    })
-                    await Update(UsersTable, user._id, {
-                        CompletedRegistration: user.CompletedRegistration,
-                        Updated_At: user.Updated_At
-                    })
+                    await Promise.all([
+                        Update(VerificationsTable, verification._id, {
+                            Used: verification.Used,
+                            Expired: verification.Expired
+                        }),
+                        Update(UsersTable, user._id, {
+                            CompletedRegistration: user.CompletedRegistration,
+                            Updated_At: user.Updated_At
+                        })
+                    ])
 
                     const { User } = verification
 

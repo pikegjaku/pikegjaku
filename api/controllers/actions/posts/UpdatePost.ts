@@ -88,28 +88,36 @@ const UpdatePost = async (c: Context) => {
                             })
 
                         if (allowed) {
-                            const city = await FindOne<CityInterface>(
-                                CitiesTable,
-                                { where: '_id = ?', params: [City] }
-                            )
-                            const country = await FindOne<CountryInterface>(
-                                CountriesTable,
-                                { where: '_id = ?', params: [Country] }
-                            )
+                            const [city, country] = await Promise.all([
+                                FindOne<CityInterface>(CitiesTable, {
+                                    where: '_id = ?',
+                                    params: [City]
+                                }),
+                                FindOne<CountryInterface>(CountriesTable, {
+                                    where: '_id = ?',
+                                    params: [Country]
+                                })
+                            ])
+
+                            const counters: Array<Promise<void>> = []
 
                             if (
                                 country &&
                                 country?._id !== post.Country.toString()
                             ) {
-                                await Increment(CountriesTable, country._id, 'Posts', 1)
-                                await Increment(CountriesTable, post.Country, 'Posts', -1)
+                                counters.push(
+                                    Increment(CountriesTable, country._id, 'Posts', 1),
+                                    Increment(CountriesTable, post.Country, 'Posts', -1)
+                                )
 
                                 post.Country = Country
                             }
 
                             if (city && city?._id !== post.City.toString()) {
-                                await Increment(CitiesTable, city._id, 'Posts', 1)
-                                await Increment(CitiesTable, post.City, 'Posts', -1)
+                                counters.push(
+                                    Increment(CitiesTable, city._id, 'Posts', 1),
+                                    Increment(CitiesTable, post.City, 'Posts', -1)
+                                )
 
                                 post.City = City
                             }
@@ -121,16 +129,19 @@ const UpdatePost = async (c: Context) => {
                             post.Urgent = Urgent
                             post.Updated_At = CurrentTimestamp()
 
-                            await Update(PostsTable, post._id, {
-                                Country: post.Country,
-                                City: post.City,
-                                Title: post.Title,
-                                Description: post.Description,
-                                Type: post.Type,
-                                BloodGroup: post.BloodGroup,
-                                Urgent: post.Urgent,
-                                Updated_At: post.Updated_At
-                            })
+                            await Promise.all([
+                                ...counters,
+                                Update(PostsTable, post._id, {
+                                    Country: post.Country,
+                                    City: post.City,
+                                    Title: post.Title,
+                                    Description: post.Description,
+                                    Type: post.Type,
+                                    BloodGroup: post.BloodGroup,
+                                    Urgent: post.Urgent,
+                                    Updated_At: post.Updated_At
+                                })
+                            ])
 
                             const newPost = await FindOne<PostInterface>(
                                 PostsTable,

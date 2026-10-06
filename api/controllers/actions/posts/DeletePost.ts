@@ -26,19 +26,18 @@ const DeletePost = async (c: Context) => {
 
                 if (isAllowed) {
                     user.Posts = user.Posts - 1
-
-                    await Update(UsersTable, user._id, { Posts: user.Posts })
-
                     post.Deleted = true
                     post.Deleted_At = CurrentTimestamp()
-                    await Update(PostsTable, post._id, {
-                        Deleted: post.Deleted,
-                        Deleted_At: post.Deleted_At
-                    })
 
-                    await Increment(CountriesTable, post.Country, 'Posts', -1)
-
-                    await Increment(CitiesTable, post.City, 'Posts', -1)
+                    await Promise.all([
+                        Update(UsersTable, user._id, { Posts: user.Posts }),
+                        Update(PostsTable, post._id, {
+                            Deleted: post.Deleted,
+                            Deleted_At: post.Deleted_At
+                        }),
+                        Increment(CountriesTable, post.Country, 'Posts', -1),
+                        Increment(CitiesTable, post.City, 'Posts', -1)
+                    ])
 
                     return await HttpResponder({
                         c,

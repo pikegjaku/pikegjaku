@@ -77,16 +77,22 @@ const UpdateUser = async (c: Context) => {
                     code: avatarResult.code
                 })
 
+            const counters: Array<Promise<void>> = []
+
             if (String(user.City) !== String(City)) {
-                await Increment(CitiesTable, user.City, 'Users', -1)
-                await Increment(CitiesTable, City, 'Users', 1)
+                counters.push(
+                    Increment(CitiesTable, user.City, 'Users', -1),
+                    Increment(CitiesTable, City, 'Users', 1)
+                )
 
                 user.City = City
             }
 
             if (String(user.Country) !== String(Country)) {
-                await Increment(CountriesTable, user.Country, 'Users', -1)
-                await Increment(CountriesTable, Country, 'Users', 1)
+                counters.push(
+                    Increment(CountriesTable, user.Country, 'Users', -1),
+                    Increment(CountriesTable, Country, 'Users', 1)
+                )
 
                 user.Country = Country
             }
@@ -98,16 +104,19 @@ const UpdateUser = async (c: Context) => {
             user.Updated_At = CurrentTimestamp()
             user.ProfileCompleted = true
 
-            await Update(UsersTable, user._id, {
-                City: user.City,
-                Country: user.Country,
-                Name: user.Name,
-                Surname: user.Surname,
-                Avatar: user.Avatar,
-                BloodGroup: user.BloodGroup,
-                Updated_At: user.Updated_At,
-                ProfileCompleted: user.ProfileCompleted
-            })
+            await Promise.all([
+                ...counters,
+                Update(UsersTable, user._id, {
+                    City: user.City,
+                    Country: user.Country,
+                    Name: user.Name,
+                    Surname: user.Surname,
+                    Avatar: user.Avatar,
+                    BloodGroup: user.BloodGroup,
+                    Updated_At: user.Updated_At,
+                    ProfileCompleted: user.ProfileCompleted
+                })
+            ])
 
             return await HttpResponder({
                 c,

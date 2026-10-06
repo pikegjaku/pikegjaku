@@ -83,14 +83,13 @@ const CreatePost = async (c: Context) => {
                         Updated_At: CurrentTimestamp()
                     })
 
-                    await Promise.all([
-                        Increment(CitiesTable, City, 'Posts', 1),
-                        Increment(CountriesTable, Country, 'Posts', 1)
-                    ])
-
                     user.Posts += 1
 
-                    await Update(UsersTable, user._id, { Posts: user.Posts })
+                    await Promise.all([
+                        Increment(CitiesTable, City, 'Posts', 1),
+                        Increment(CountriesTable, Country, 'Posts', 1),
+                        Update(UsersTable, user._id, { Posts: user.Posts })
+                    ])
 
                     const newPost = await FindOne<PostInterface>(PostsTable, {
                         columns: PostListSelector,
