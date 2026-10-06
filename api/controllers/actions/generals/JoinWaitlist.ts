@@ -14,6 +14,30 @@ import { CurrentTimestamp, FormatDate } from '@/data/dates'
 import { WAITLIST_WELCOME_RETRY_MS } from '@/data/constants'
 import { EmailValidation } from '@pikegjaku/shared/validations'
 
+const sendWaitlistEmails = async (
+    entry: WaitlistInterface | null,
+    email: string,
+    inserted: boolean
+) => {
+    try {
+        const total = await Count(WaitlistsTable)
+
+        const date = FormatDate(new Date())
+
+        const [messageId] = await Promise.all([
+            SendWelcomeEmail(email),
+            inserted ? SendSignupNotification({ email, total, date }) : false
+        ])
+
+        if (typeof messageId === 'string')
+            await Update(WaitlistsTable, entry?._id, {
+                Metadata: { ...entry?.Metadata, EmailId: messageId }
+            })
+    } catch (error) {
+        Console.Error('JoinWaitlist', error)
+    }
+}
+
 const JoinWaitlist = async (c: Context) => {
     try {
         const { email } = await c.req.json()
@@ -54,33 +78,10 @@ const JoinWaitlist = async (c: Context) => {
             Date.now() - new Date(previous.Subscribed_At).getTime() >
                 WAITLIST_WELCOME_RETRY_MS
 
-        try {
-            if (!welcomed && retryable) {
-                const total = await Count(WaitlistsTable)
-
-                const date = FormatDate(new Date())
-
-                const [messageId] = await Promise.all([
-                    SendWelcomeEmail(normalized),
-                    inserted
-                        ? SendSignupNotification({
-                              email: normalized,
-                              total,
-                              date
-                          })
-                        : false
-                ])
-
-                const entry = created ?? previous
-
-                if (typeof messageId === 'string')
-                    await Update(WaitlistsTable, entry?._id, {
-                        Metadata: { ...entry?.Metadata, EmailId: messageId }
-                    })
-            }
-        } catch (error) {
-            Console.Error('JoinWaitlist', error)
-        }
+        if (!welcomed && retryable)
+            c.executionCtx.waitUntil(
+                sendWaitlistEmails(created ?? previous, normalized, inserted)
+            )
 
         return await HttpResponder({
             c,
