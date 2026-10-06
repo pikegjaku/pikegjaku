@@ -214,11 +214,13 @@ The API runs on Cloudflare Workers, configured in `api/wrangler.json`. `api/inde
 
 **Bindings**
 
-| Binding  | Resource                                      | Used for                 |
-| -------- | --------------------------------------------- | ------------------------ |
-| `DB`     | D1 database `pikegjaku` (`eu` jurisdiction)   | All API data             |
-| `CDN`    | R2 bucket `pikegjaku-cdn` (`eu` jurisdiction) | Avatars                  |
-| `IMAGES` | Cloudflare Images                             | Resizing avatars to WebP |
+| Binding  | Resource                                    | Used for                                    |
+| -------- | ------------------------------------------- | ------------------------------------------- |
+| `DB`     | D1 database `pikegjaku` (`eu` jurisdiction) | All API data                                |
+| `CDN`    | R2 bucket `pikegjaku-prod`                  | Avatars, served at `cdn-prod.pikegjaku.com` |
+| `IMAGES` | Cloudflare Images                           | Resizing avatars to WebP                    |
+
+In `api:dev` the `CDN` binding is remote and points at the `pikegjaku-dev` bucket, so avatars uploaded while developing land in the real dev bucket and show at `cdn-dev.pikegjaku.com`, which is the `EXPO_PUBLIC_CDN_URL` of the mobile `local` environment. That remote binding needs `bunx wrangler login` once on the machine.
 
 **Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
 

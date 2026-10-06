@@ -42,8 +42,9 @@
     "r2_buckets": [
         {
             "binding": "CDN",
-            "bucket_name": "pikegjaku-cdn",
-            "jurisdiction": "eu"
+            "bucket_name": "pikegjaku-prod",
+            "preview_bucket_name": "pikegjaku-dev",
+            "remote": true
         }
     ],
     "images": {
