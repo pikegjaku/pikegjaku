@@ -1,9 +1,18 @@
 export const MAX_ENTITY_ITEMS = 50
-export const DEFAULT_TEST_NUMBER = '00000000'
 export const MAX_AVATAR_BYTES = 10 * 1024 * 1024
 export const MAX_REQUEST_BYTES = 20 * 1024 * 1024
 export const DATA_URI_PATTERN = /^data:image\/[a-zA-Z0-9.+-]+;base64,(.+)$/
 export const CACHE_TTL = 3600 * 1000
+export const MAX_BOUND_PARAMETERS = 100
+
+export const BOOLEAN_TRUE_VALUES: Array<unknown> = [true, 'true', 1, '1', 'yes']
+export const BOOLEAN_FALSE_VALUES: Array<unknown> = [false, 'false', 0, '0', 'no']
+
+export const DIAL_CODE_COUNTRIES: Record<string, string> = {
+    '+383': 'XK',
+    '+355': 'AL',
+    '+389': 'MK'
+}
 
 export const RESERVED_EMAIL_DOMAINS = [
     'example.com',
@@ -13,23 +22,6 @@ export const RESERVED_EMAIL_DOMAINS = [
     'invalid',
     'localhost'
 ]
-
-export const MONGO_OPTIONS = {
-    maxPoolSize: 20,
-    minPoolSize: 2,
-    maxIdleTimeMS: 30000,
-    serverSelectionTimeoutMS: 10000,
-    socketTimeoutMS: 45000,
-    connectTimeoutMS: 10000,
-    heartbeatFrequencyMS: 10000,
-    waitQueueTimeoutMS: 10000,
-    retryWrites: true,
-    retryReads: true,
-    compressors: ['zlib' as const],
-    autoIndex: false
-}
-
-export const SERVER_LOCATION = 'weur' as const
 
 export const BRAND = {
     RED: '#f44336',
@@ -157,24 +149,6 @@ export const COUNTRIES_ROUTES = {
 
 export const GENERAL_ROUTES = {
     JOIN_WAITLIST: '/join-waitlist'
-}
-
-export const MODELS = {
-    USER: 'User',
-    POST: 'Post',
-    VERIFICATION: 'Verification',
-    COUNTRY: 'Country',
-    CENTER: 'Center',
-    CITY: 'City',
-    WAITLIST: 'Waitlist'
-}
-
-export const POPULATE = {
-    USER: 'User',
-    POST: 'Post',
-    VERIFICATION: 'Verification',
-    COUNTRY: 'Country',
-    CITY: 'City'
 }
 
 export const VERFICATIONS_TYPES = {

@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { CenterInterface } from '@/ts'
 
-import { CenterModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CentersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
@@ -9,9 +11,9 @@ const DeleteCenter = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const center = await CenterModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const center = await FindOne<CenterInterface>(CentersTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!center)
@@ -25,7 +27,10 @@ const DeleteCenter = async (c: Context) => {
 
         center.Deleted = true
         center.Deleted_At = CurrentTimestamp()
-        await center.save()
+        await Update(CentersTable, center._id, {
+            Deleted: center.Deleted,
+            Deleted_At: center.Deleted_At
+        })
 
         return await HttpResponder({
             c,

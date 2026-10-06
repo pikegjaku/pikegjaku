@@ -1,6 +1,9 @@
 import type { Context } from 'hono'
+import type { CountryInterface } from '@/ts'
 
-import { CountryModel } from '@/data/models'
+import { Count, Find } from '@/controllers/libs/d1'
+import { CountriesTable } from '@/data/tables'
+import { ListFilter } from '@/controllers/filters'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { MAX_ENTITY_ITEMS } from '@/data/constants'
@@ -9,23 +12,16 @@ const ListCountries = async (c: Context) => {
     try {
         const { skip, limit, term } = await c.req.json()
 
-        const filters: Record<string, unknown> = {
-            Deleted: { $ne: true }
-        }
-
-        if (term) {
-            filters.Name = { $regex: term, $options: 'i' }
-        }
+        const filters = ListFilter(term, ['Name'])
 
         const [count, countries] = await Promise.all([
-            CountryModel.countDocuments(filters),
-            CountryModel.find(filters)
-                .sort({ Name: 1, _id: 1 })
-                .skip(skip || 0)
-                .limit(
-                    limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20
-                )
-                .lean()
+            Count(CountriesTable, filters),
+            Find<CountryInterface>(CountriesTable, {
+                ...filters,
+                order: 'Name ASC, _id ASC',
+                skip: skip || 0,
+                limit: limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20
+            })
         ])
 
         if (countries) {

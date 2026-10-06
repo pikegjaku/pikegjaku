@@ -23,10 +23,11 @@ pikegjaku-/
 │   ├── helpers/       # Helper functions
 │   ├── ts/            # Centralized types (Interfaces.ts, Types.ts)
 │   └── data/          # Static data
-├── api/               # Hono.js backend (Cloudflare Workers + Durable Object)
+├── api/               # Hono.js backend (Cloudflare Workers + D1)
 │   ├── controllers/   # Business logic (actions, filters, helpers, libs, middlewares)
 │   ├── router/        # Hono app wiring the routes to their middlewares
-│   ├── data/          # Data layer (models, structures, constants, etc.)
+│   ├── data/          # Data layer (tables, constants, seed data, etc.)
+│   ├── migrations/    # D1 schema migrations (SQL)
 │   ├── scripts/       # Utility scripts
 │   └── ts/            # Centralized types (Interfaces.ts, Types.ts)
 ├── web/               # Astro marketing site (deployed to Cloudflare Pages)
@@ -42,7 +43,7 @@ pikegjaku-/
 ## Tech Stack
 
 - **Mobile**: React Native 0.83 + Expo 55 + Expo Router + Zustand + twrnc (Tailwind) + Phosphor Icons + RNEUI
-- **API**: Hono.js + Cloudflare Workers (Durable Object) + Mongoose 9 (MongoDB) + R2 + Cloudflare Images + jose (JWT)
+- **API**: Hono.js + Cloudflare Workers + D1 (SQLite) + R2 + Cloudflare Images + jose (JWT)
 - **Web**: Astro 6 + Tailwind 4 + sitemap (deployed to Cloudflare Pages)
 - **Admin**: React + Vite
 - **Shared**: @pikegjaku/shared - validations, helpers, constants
@@ -152,14 +153,14 @@ All scripts are defined in the **root** `package.json` and must be run from the 
 
 Every script that runs an app goes through `envless run --workspace bfzli --product pikegjaku --project <project> --env <env>`, so its environment is decrypted in memory from Envless. There is no non-wrapped variant.
 
-- `bun run api:dev` / `api:deploy` / `api:seed` / `api:indexes` — API (`wrangler dev` on 1111, deployed to Cloudflare Workers)
+- `bun run api:dev` / `api:deploy` / `api:migrate` / `api:seed` — API (`wrangler dev` on 1111 against a local D1, deployed to Cloudflare Workers)
 - `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` / `mobile:run:android` / `mobile:run:ios` — Expo (Metro on 3333)
 - `bun run web:dev` / `web:build` / `web:preview` — web (2222)
 - `bun run admin:dev` / `admin:build` / `admin:preview` — admin (5555)
 - `bun run <workspace>:exec -- <command>` — run anything with that workspace's variables
 - `bun run format` / `bun run lint` / `bun run check` — Formatting & linting
 
-Type checks, linters, `api:build` (a `wrangler deploy --dry-run` bundle), `api:types` and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
+Type checks, linters, `api:build` (a `wrangler deploy --dry-run` bundle), `api:types`, `api:migrate`, `api:seed` and EAS builds are not wrapped: they need no environment, and EAS bundles on its own servers where the environment comes from `eas.json` and the EAS dashboard.
 
 When adding new scripts, always add them to the root `package.json` following the `<workspace>:<command>` naming pattern (e.g., `api:migrate`, `mobile:test`), and wrap anything that reads environment variables in `envless run`.
 
@@ -209,21 +210,21 @@ After one `envless login` on the machine, every script resolves its variables it
 
 ### API Deployment (Cloudflare Workers)
 
-The API runs on Cloudflare Workers, configured in `api/wrangler.json`. The Worker in `api/index.ts` forwards every request to one Durable Object, `Server`, which runs the Hono app from `api/router/` and keeps the MongoDB connection pool open between requests (a plain Worker cannot reuse a socket across requests). `SERVER_LOCATION` in `api/data/constants/Constants.ts` places that object close to the database, so keep it in the region of the cluster. The object's name is the region, so changing it starts a fresh object there.
+The API runs on Cloudflare Workers, configured in `api/wrangler.json`. `api/index.ts` serves the Hono app from `api/router/`, and every route reads and writes the D1 database `pikegjaku` through the helpers in `api/controllers/libs/d1/` (`Find`, `FindOne`, `Count`, `Insert`, `Update`, `Increment`, `Remove`, `Exists`, `Query`). `references` on `Find` and `FindOne` replaces an id column with the row it points to, so a post comes back with its user, city and country nested inside it.
 
 **Bindings**
 
-| Binding  | Resource                                      | Used for                    |
-| -------- | --------------------------------------------- | --------------------------- |
-| `SERVER` | Durable Object `Server`                       | Runs the API, owns the pool |
-| `CDN`    | R2 bucket `pikegjaku-cdn` (`eu` jurisdiction) | Avatars                     |
-| `IMAGES` | Cloudflare Images                             | Resizing avatars to WebP    |
+| Binding  | Resource                                      | Used for                 |
+| -------- | --------------------------------------------- | ------------------------ |
+| `DB`     | D1 database `pikegjaku` (`eu` jurisdiction)   | All API data             |
+| `CDN`    | R2 bucket `pikegjaku-cdn` (`eu` jurisdiction) | Avatars                  |
+| `IMAGES` | Cloudflare Images                             | Resizing avatars to WebP |
 
 **Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
 
-**Database**: the Worker reaches MongoDB over the public internet from no fixed IP, so the cluster's access list must allow `0.0.0.0/0`. It needs MongoDB 4.4 or newer and either no TLS or a publicly trusted certificate, because Workers support neither `tlsCAFile` nor `tlsInsecure`/`tlsAllowInvalidCertificates`. Workers also ship no Albanian locale data, so Albanian dates are formatted by `FormatDate` instead of `Intl`.
+**Database**: the schema lives in `api/migrations/` as numbered SQL files, and each table has a column map in `api/data/tables/` that tells the helpers which columns hold booleans, dates (ISO 8601 text) or JSON. A schema change is a new file from `bunx wrangler d1 migrations create DB <name>` (run in `api/`) plus the matching edit in `data/tables/`. `api:deploy` applies pending migrations to the remote database before it uploads the code. Locally, `wrangler dev` uses its own D1 in `api/.wrangler/state`: `bun run api:migrate` creates the tables and `bun run api:seed` fills the countries and cities, so local development never touches production data. Ids stay 24-character hex strings in the ObjectId format, and D1 Time Travel restores the database to any minute of the last 30 days (7 on the Workers Free plan). Workers also ship no Albanian locale data, so Albanian dates are formatted by `FormatDate` instead of `Intl`.
 
-**Deploying**: run `bunx wrangler login` once (in CI set `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` instead), then `bun run api:deploy`. The API hostname is attached to the `pikegjaku-api` Worker as a Custom Domain (Workers & Pages → pikegjaku-api → Settings → Domains & Routes). Logs are in Workers Logs.
+**Deploying**: Workers Builds deploys every push to `Production` that touches `api/`, `packages/` or the root manifests (Workers & Pages → pikegjaku-api → Settings → Builds). It runs in the root directory `api` with the build command `cd .. && bun install --frozen-lockfile` and the deploy command `cd .. && bun run api:deploy`, the variables `SKIP_DEPENDENCY_INSTALL=true` and `BUN_VERSION=1.4.2`, and the secrets `ENVLESS_TOKEN` and `ENVLESS_KEY`. To deploy from a machine instead, run `bunx wrangler login` once, then `bun run api:deploy`. The API hostname is attached to the `pikegjaku-api` Worker as a Custom Domain (Workers & Pages → pikegjaku-api → Settings → Domains & Routes). Logs are in Workers Logs.
 
 ### Contributing
 

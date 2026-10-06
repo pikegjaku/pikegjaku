@@ -1,8 +1,10 @@
 import type { Context, Next } from 'hono'
+import type { UserInterface } from '@/ts'
 
 import { Console } from '@/controllers/helpers/logs'
 import { HttpResponder } from '@/controllers/helpers/http'
-import { UserModel } from '@/data/models'
+import { FindOne } from '@/controllers/libs/d1'
+import { UsersTable } from '@/data/tables'
 import { AuthTokenVerifier } from '@/controllers/libs/jwt'
 
 const AuthMiddleware = async (c: Context, next: Next) => {
@@ -11,9 +13,9 @@ const AuthMiddleware = async (c: Context, next: Next) => {
             await AuthTokenVerifier(c)
 
         if (code === 200 && userId && token && refresh) {
-            const user = await UserModel.findOne({
-                _id: userId,
-                Deleted: { $ne: true }
+            const user = await FindOne<UserInterface>(UsersTable, {
+                where: '_id = ? AND Deleted IS NOT 1',
+                params: [userId]
             })
 
             if (user) {

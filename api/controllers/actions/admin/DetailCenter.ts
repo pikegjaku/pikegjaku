@@ -1,21 +1,23 @@
 import type { Context } from 'hono'
+import type { CenterInterface } from '@/ts'
 
-import { CenterModel } from '@/data/models'
+import { FindOne } from '@/controllers/libs/d1'
+import { CentersTable, CitiesTable, CountriesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 
 const DetailCenter = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const center = await CenterModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const center = await FindOne<CenterInterface>(CentersTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id],
+            references: {
+                City: CitiesTable,
+                Country: CountriesTable
+            }
         })
-            .populate(POPULATE.CITY)
-            .populate(POPULATE.COUNTRY)
-            .lean()
 
         if (center)
             return await HttpResponder({

@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { CountryInterface } from '@/ts'
 
-import { CountryModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CountriesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
@@ -9,9 +11,9 @@ const DeleteCountry = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const country = await CountryModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const country = await FindOne<CountryInterface>(CountriesTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!country)
@@ -25,7 +27,10 @@ const DeleteCountry = async (c: Context) => {
 
         country.Deleted = true
         country.Deleted_At = CurrentTimestamp()
-        await country.save()
+        await Update(CountriesTable, country._id, {
+            Deleted: country.Deleted,
+            Deleted_At: country.Deleted_At
+        })
 
         return await HttpResponder({
             c,

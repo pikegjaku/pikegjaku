@@ -2,9 +2,9 @@ import type { Context } from 'hono'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CurrentTimestamp } from '@/data/dates'
-import { CityModel, CountryModel } from '@/data/models'
+import { Increment, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, UsersTable } from '@/data/tables'
 import { Console } from '@/controllers/helpers/logs'
-import { ObjectId } from '@/controllers/libs/mongo'
 import { GetCities, GetCountries } from '@/controllers/helpers/entities'
 import { HandleAvatar } from '@/controllers/helpers/users'
 
@@ -78,39 +78,17 @@ const UpdateUser = async (c: Context) => {
                 })
 
             if (String(user.City) !== String(City)) {
-                const oldCity = await CityModel.findById(user.City)
+                await Increment(CitiesTable, user.City, 'Users', -1)
+                await Increment(CitiesTable, City, 'Users', 1)
 
-                if (oldCity) {
-                    oldCity.Users = oldCity.Users - 1
-                    await oldCity.save()
-                }
-
-                const newCity = await CityModel.findById(City)
-
-                if (newCity) {
-                    newCity.Users = newCity.Users + 1
-                    await newCity.save()
-                }
-
-                user.City = ObjectId(City)
+                user.City = City
             }
 
             if (String(user.Country) !== String(Country)) {
-                const oldCountry = await CountryModel.findById(user.Country)
+                await Increment(CountriesTable, user.Country, 'Users', -1)
+                await Increment(CountriesTable, Country, 'Users', 1)
 
-                if (oldCountry) {
-                    oldCountry.Users = oldCountry.Users - 1
-                    await oldCountry.save()
-                }
-
-                const newCountry = await CountryModel.findById(Country)
-
-                if (newCountry) {
-                    newCountry.Users = newCountry.Users + 1
-                    await newCountry.save()
-                }
-
-                user.Country = ObjectId(Country)
+                user.Country = Country
             }
 
             user.Name = Name
@@ -120,7 +98,16 @@ const UpdateUser = async (c: Context) => {
             user.Updated_At = CurrentTimestamp()
             user.ProfileCompleted = true
 
-            await user.save()
+            await Update(UsersTable, user._id, {
+                City: user.City,
+                Country: user.Country,
+                Name: user.Name,
+                Surname: user.Surname,
+                Avatar: user.Avatar,
+                BloodGroup: user.BloodGroup,
+                Updated_At: user.Updated_At,
+                ProfileCompleted: user.ProfileCompleted
+            })
 
             return await HttpResponder({
                 c,

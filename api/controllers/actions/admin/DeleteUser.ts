@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { UserInterface } from '@/ts'
 
-import { UserModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
@@ -9,9 +11,9 @@ const DeleteUser = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const user = await UserModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const user = await FindOne<UserInterface>(UsersTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!user)
@@ -25,7 +27,10 @@ const DeleteUser = async (c: Context) => {
 
         user.Deleted = true
         user.Deleted_At = CurrentTimestamp()
-        await user.save()
+        await Update(UsersTable, user._id, {
+            Deleted: user.Deleted,
+            Deleted_At: user.Deleted_At
+        })
 
         return await HttpResponder({
             c,

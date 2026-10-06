@@ -1,10 +1,12 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
+import { FindOne, Increment, Update } from '@/controllers/libs/d1'
 
-import { CityModel, CountryModel, PostModel } from '@/data/models'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 
 const DeletePost = async (c: Context) => {
     try {
@@ -13,9 +15,9 @@ const DeletePost = async (c: Context) => {
         if (user) {
             const { postId } = await c.req.json()
 
-            const post = await PostModel.findOne({
-                _id: postId,
-                Deleted: { $ne: true }
+            const post = await FindOne<PostInterface>(PostsTable, {
+                where: '_id = ? AND Deleted IS NOT 1',
+                params: [postId]
             })
 
             if (post) {
@@ -25,23 +27,18 @@ const DeletePost = async (c: Context) => {
                 if (isAllowed) {
                     user.Posts = user.Posts - 1
 
-                    await user.save()
+                    await Update(UsersTable, user._id, { Posts: user.Posts })
 
                     post.Deleted = true
                     post.Deleted_At = CurrentTimestamp()
-                    await post.save()
-
-                    await CountryModel.findByIdAndUpdate(post.Country, {
-                        $inc: {
-                            Posts: -1
-                        }
+                    await Update(PostsTable, post._id, {
+                        Deleted: post.Deleted,
+                        Deleted_At: post.Deleted_At
                     })
 
-                    await CityModel.findByIdAndUpdate(post.City, {
-                        $inc: {
-                            Posts: -1
-                        }
-                    })
+                    await Increment(CountriesTable, post.Country, 'Posts', -1)
+
+                    await Increment(CitiesTable, post.City, 'Posts', -1)
 
                     return await HttpResponder({
                         c,

@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 
-import { VerificationModel } from '@/data/models'
+import { Exists } from '@/controllers/libs/d1'
+import { VerificationsTable } from '@/data/tables'
 import { Console } from '@/controllers/helpers/logs'
 
 const VerificationCodeGenerator = async (): Promise<number | null> => {
@@ -9,7 +10,10 @@ const VerificationCodeGenerator = async (): Promise<number | null> => {
     try {
         while (code === null) {
             const random_code = crypto.randomInt(11432, 97503)
-            const exists = await VerificationModel.exists({ Code: random_code })
+            const exists = await Exists(VerificationsTable, {
+                where: 'Code = ?',
+                params: [random_code]
+            })
 
             if (!exists) {
                 code = random_code

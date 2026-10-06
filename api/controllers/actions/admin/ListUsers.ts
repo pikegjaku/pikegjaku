@@ -1,37 +1,31 @@
 import type { Context } from 'hono'
+import type { UserInterface } from '@/ts'
 
-import { UserModel } from '@/data/models'
+import { Count, Find } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, UsersTable } from '@/data/tables'
+import { ListFilter } from '@/controllers/filters'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { MAX_ENTITY_ITEMS, POPULATE } from '@/data/constants'
+import { MAX_ENTITY_ITEMS } from '@/data/constants'
 
 const ListUsers = async (c: Context) => {
     try {
         const { skip, limit, term } = await c.req.json()
 
-        const filters: Record<string, unknown> = {
-            Deleted: { $ne: true }
-        }
-
-        if (term) {
-            filters.$or = [
-                { Name: { $regex: term, $options: 'i' } },
-                { Surname: { $regex: term, $options: 'i' } },
-                { Phone: { $regex: term, $options: 'i' } }
-            ]
-        }
+        const filters = ListFilter(term, ['Name', 'Surname', 'Phone'])
 
         const [count, users] = await Promise.all([
-            UserModel.countDocuments(filters),
-            UserModel.find(filters)
-                .populate(POPULATE.COUNTRY)
-                .populate(POPULATE.CITY)
-                .sort({ Created_At: -1, _id: 1 })
-                .skip(skip || 0)
-                .limit(
-                    limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20
-                )
-                .lean()
+            Count(UsersTable, filters),
+            Find<UserInterface>(UsersTable, {
+                ...filters,
+                order: 'Created_At DESC, _id ASC',
+                skip: skip || 0,
+                limit: limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20,
+                references: {
+                    Country: CountriesTable,
+                    City: CitiesTable
+                }
+            })
         ])
 
         if (users) {

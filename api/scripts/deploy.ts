@@ -3,6 +3,17 @@ import { load } from '@goenvless/env/server'
 import { Console } from '@/controllers/helpers/logs'
 import config from '@/wrangler.json'
 
+const Execute = (
+    command: string,
+    env: NodeJS.ProcessEnv = process.env
+): Promise<number> =>
+    new Promise((resolve) =>
+        spawn(command, { shell: true, stdio: 'inherit', env }).on(
+            'close',
+            (code) => resolve(code ?? 1)
+        )
+    )
+
 const Run = async () => {
     const values = await load()
     const names = config.secrets.required
@@ -16,20 +27,16 @@ const Run = async () => {
 
     const secrets = Object.fromEntries(names.map((name) => [name, values[name]]))
 
-    const wrangler = spawn(
+    const migrated = await Execute('bunx wrangler d1 migrations apply DB --remote')
+
+    if (migrated !== 0) process.exit(migrated)
+
+    const deployed = await Execute(
         'printf "%s" "$WRANGLER_SECRETS" | bunx wrangler deploy --secrets-file /dev/stdin',
-        {
-            shell: true,
-            stdio: 'inherit',
-            env: { ...process.env, WRANGLER_SECRETS: JSON.stringify(secrets) }
-        }
+        { ...process.env, WRANGLER_SECRETS: JSON.stringify(secrets) }
     )
 
-    const code = await new Promise<number>((resolve) =>
-        wrangler.on('close', (exitCode) => resolve(exitCode ?? 1))
-    )
-
-    process.exit(code)
+    process.exit(deployed)
 }
 
 try {

@@ -1,34 +1,32 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
-import { PostModel } from '@/data/models'
+import { Count, Find } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
+import { ListFilter } from '@/controllers/filters'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { MAX_ENTITY_ITEMS, POPULATE } from '@/data/constants'
+import { MAX_ENTITY_ITEMS } from '@/data/constants'
 
 const ListPosts = async (c: Context) => {
     try {
         const { skip, limit, term } = await c.req.json()
 
-        const filters: Record<string, unknown> = {
-            Deleted: { $ne: true }
-        }
-
-        if (term) {
-            filters.Title = { $regex: term, $options: 'i' }
-        }
+        const filters = ListFilter(term, ['Title'])
 
         const [count, posts] = await Promise.all([
-            PostModel.countDocuments(filters),
-            PostModel.find(filters)
-                .populate(POPULATE.USER)
-                .populate(POPULATE.COUNTRY)
-                .populate(POPULATE.CITY)
-                .sort({ Created_At: -1, _id: 1 })
-                .skip(skip || 0)
-                .limit(
-                    limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20
-                )
-                .lean()
+            Count(PostsTable, filters),
+            Find<PostInterface>(PostsTable, {
+                ...filters,
+                order: 'Created_At DESC, _id ASC',
+                skip: skip || 0,
+                limit: limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20,
+                references: {
+                    User: UsersTable,
+                    Country: CountriesTable,
+                    City: CitiesTable
+                }
+            })
         ])
 
         if (posts) {

@@ -1,11 +1,6 @@
 import {
-    AvatarValidation,
     BloodGroupValidation,
-    CityNameValidation,
     CityValidation,
-    CodeNumberValidation,
-    CountryCodeValidation,
-    CountryNameValidation,
     CountryValidation,
     PhoneNumberValidation,
     PostDescriptionValidation,
@@ -16,13 +11,8 @@ import {
 } from '@pikegjaku/shared/validations'
 
 export {
-    AvatarValidation,
     BloodGroupValidation,
-    CityNameValidation,
     CityValidation,
-    CodeNumberValidation,
-    CountryCodeValidation,
-    CountryNameValidation,
     CountryValidation,
     PhoneNumberValidation,
     PostDescriptionValidation,

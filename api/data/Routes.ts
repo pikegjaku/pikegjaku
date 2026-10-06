@@ -60,9 +60,9 @@ import {
 } from '@/data/constants'
 
 const ROUTES: RouteDefinition[] = [
-    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.AUTH_USER, auth: 'db', handler: AuthUser },
-    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.INVALIDATE_CODE, auth: 'db', handler: InvalidateCode },
-    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.VERIFY_CODE, auth: 'db', handler: VerifyCode },
+    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.AUTH_USER, auth: 'public', handler: AuthUser },
+    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.INVALIDATE_CODE, auth: 'public', handler: InvalidateCode },
+    { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.VERIFY_CODE, auth: 'public', handler: VerifyCode },
     { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.USER_POSTS, auth: 'user', handler: UserPosts },
     { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.UPDATE_USER, auth: 'user', handler: UpdateUser },
     { group: GROUP_ROUTES.USERS, path: USERS_ROUTES.DELETE_USER, auth: 'user', handler: CloseAccount },
@@ -75,11 +75,11 @@ const ROUTES: RouteDefinition[] = [
     { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.UPDATE_POST, auth: 'user', handler: UpdatePost },
     { group: GROUP_ROUTES.POSTS, path: POSTS_ROUTES.LIST_POST, auth: 'user', handler: ListPost },
 
-    { group: GROUP_ROUTES.COUNTRIES, path: COUNTRIES_ROUTES.LIST_COUNTRIES, auth: 'db', handler: ListCountries },
+    { group: GROUP_ROUTES.COUNTRIES, path: COUNTRIES_ROUTES.LIST_COUNTRIES, auth: 'public', handler: ListCountries },
 
-    { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'db', handler: ListCities },
+    { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'public', handler: ListCities },
 
-    { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'db', handler: JoinWaitlist },
+    { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'public', handler: JoinWaitlist },
 
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.STATS, auth: 'admin', handler: Stats },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.LIST_USERS, auth: 'admin', handler: ListUsers },

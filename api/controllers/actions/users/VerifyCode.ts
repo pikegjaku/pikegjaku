@@ -1,8 +1,8 @@
 import type { Context } from 'hono'
-import type { QueryFilter } from 'mongoose'
-import type { VerificationInterface } from '@/ts'
+import type { UserInterface, VerificationInterface } from '@/ts'
 
-import { UserModel, VerificationModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { UsersTable, VerificationsTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { GenerateJsonWebToken } from '@/controllers/libs/jwt'
 import { Console } from '@/controllers/helpers/logs'
@@ -15,17 +15,16 @@ const VerifyCode = async (c: Context) => {
         const phoneNumberNumeric = phoneNumber
         const codeNumeric = typeof code === 'string' ? parseInt(code) : code
 
-        const user = await UserModel.findOne({
-            Phone: phoneNumberNumeric,
-            Deleted: {
-                $ne: true
-            }
+        const user = await FindOne<UserInterface>(UsersTable, {
+            where: 'Phone = ? AND Deleted IS NOT 1',
+            params: [phoneNumberNumeric]
         })
 
         if (user) {
-            const verification = await VerificationModel.findOne({
-                User: user?._id
-            } as QueryFilter<VerificationInterface>)
+            const verification = await FindOne<VerificationInterface>(
+                VerificationsTable,
+                { where: 'User = ?', params: [user?._id] }
+            )
 
             if (verification) {
                 const { Code, Expired, Attempts, Used, Expires_At } =
@@ -53,7 +52,9 @@ const VerifyCode = async (c: Context) => {
                 else if (Attempts >= 3) {
                     verification.Expired = true
 
-                    await verification.save()
+                    await Update(VerificationsTable, verification._id, {
+                        Expired: verification.Expired
+                    })
 
                     return await HttpResponder({
                         c,
@@ -65,7 +66,9 @@ const VerifyCode = async (c: Context) => {
                 } else if (code2Numeric !== codeNumeric) {
                     verification.Attempts = Attempts + 1
 
-                    await verification.save()
+                    await Update(VerificationsTable, verification._id, {
+                        Attempts: verification.Attempts
+                    })
 
                     return await HttpResponder({
                         c,
@@ -77,8 +80,9 @@ const VerifyCode = async (c: Context) => {
                 } else if (Expires_At < new Date()) {
                     verification.Expired = true
 
-                    await verification.save()
-                    await user.save()
+                    await Update(VerificationsTable, verification._id, {
+                        Expired: verification.Expired
+                    })
 
                     return await HttpResponder({
                         c,
@@ -94,8 +98,14 @@ const VerifyCode = async (c: Context) => {
                     user.CompletedRegistration = true
                     user.Updated_At = CurrentTimestamp()
 
-                    await verification.save()
-                    await user.save()
+                    await Update(VerificationsTable, verification._id, {
+                        Used: verification.Used,
+                        Expired: verification.Expired
+                    })
+                    await Update(UsersTable, user._id, {
+                        CompletedRegistration: user.CompletedRegistration,
+                        Updated_At: user.Updated_At
+                    })
 
                     const { User } = verification
 
@@ -112,8 +122,7 @@ const VerifyCode = async (c: Context) => {
                         message: 'Kodi i verifikimit të numrit të telefonit u verifikua me sukses.',
                         code: 200,
                         data: {
-                            // @ts-expect-error - doesn't like the _doc property
-                            ...user._doc,
+                            ...user,
                             Token: token,
                             Refresh: refresh
                         }

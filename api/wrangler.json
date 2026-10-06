@@ -13,18 +13,22 @@
         "port": 1111,
         "generate_types": true
     },
-    "durable_objects": {
-        "bindings": [
-            {
-                "name": "SERVER",
-                "class_name": "Server"
-            }
-        ]
-    },
     "migrations": [
         {
             "tag": "v1",
             "new_sqlite_classes": ["Server"]
+        },
+        {
+            "tag": "v2",
+            "deleted_classes": ["Server"]
+        }
+    ],
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "pikegjaku",
+            "database_id": "cb5e4395-4840-46e8-802c-251d30ff737a",
+            "migrations_dir": "migrations"
         }
     ],
     "r2_buckets": [
@@ -41,7 +45,6 @@
         "required": [
             "AUTH_ACCESS_TOKEN_SECRET",
             "AUTH_REFRESH_TOKEN_SECRET",
-            "DATABASE_URL",
             "ENV",
             "OPENEMAIL_ADMIN",
             "OPENEMAIL_API_KEY",

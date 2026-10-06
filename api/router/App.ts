@@ -5,15 +5,12 @@ import { Hono } from 'hono'
 import { GlobalMiddlewares } from '@/controllers/helpers/api'
 import { CatchAll } from '@/controllers/helpers/router'
 import { AdminMiddleware, AuthMiddleware } from '@/controllers/middlewares'
-import { Connect } from '@/controllers/libs/mongo'
 import ROUTES from '@/data/Routes'
 
 const MIDDLEWARE_STACK: Record<RouteAuthLevel, Handler[]> = {
     public: [],
-    db: [Connect as unknown as Handler],
-    user: [Connect as unknown as Handler, AuthMiddleware as unknown as Handler],
+    user: [AuthMiddleware as unknown as Handler],
     admin: [
-        Connect as unknown as Handler,
         AuthMiddleware as unknown as Handler,
         AdminMiddleware as unknown as Handler
     ]

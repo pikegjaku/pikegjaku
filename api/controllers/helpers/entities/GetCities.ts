@@ -1,7 +1,8 @@
 import type { CityInterface } from '@/ts'
 
 import { env } from 'cloudflare:workers'
-import { CityModel } from '@/data/models'
+import { Find } from '@/controllers/libs/d1'
+import { CitiesTable } from '@/data/tables'
 import { CityListSelector } from '@/data/constants/Selectors'
 import { CACHE_TTL, ENVIRONMENTS } from '@/data/constants'
 
@@ -12,20 +13,22 @@ const GetCities = async (): Promise<Array<CityInterface>> => {
     if (env.ENV === ENVIRONMENTS.PROD) {
         if (cache && Date.now() - cachedAt < CACHE_TTL) return cache
 
-        const cities = await CityModel.find({ Deleted: { $ne: true } })
-            .select(CityListSelector)
-            .sort({ Name: 1 })
-            .lean()
+        const cities = await Find<CityInterface>(CitiesTable, {
+            columns: CityListSelector,
+            where: 'Deleted IS NOT 1',
+            order: 'Name ASC'
+        })
 
         cache = cities
         cachedAt = Date.now()
 
         return cities
     } else {
-        const cities = await CityModel.find({ Deleted: { $ne: true } })
-            .select(CityListSelector)
-            .sort({ Name: 1 })
-            .lean()
+        const cities = await Find<CityInterface>(CitiesTable, {
+            columns: CityListSelector,
+            where: 'Deleted IS NOT 1',
+            order: 'Name ASC'
+        })
 
         return cities
     }

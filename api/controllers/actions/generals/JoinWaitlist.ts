@@ -1,7 +1,9 @@
 import type { Context } from 'hono'
+import type { WaitlistInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
-import { WaitlistModel } from '@/data/models'
+import { Count, FindOne, Insert, Update } from '@/controllers/libs/d1'
+import { WaitlistsTable } from '@/data/tables'
 import {
     SendSignupNotification,
     SendWelcomeEmail
@@ -31,22 +33,19 @@ const JoinWaitlist = async (c: Context) => {
                 message: 'Email nuk është i vlefshëm.'
             })
 
-        const result = await WaitlistModel.findOneAndUpdate(
-            { Email: normalized },
-            {
-                $setOnInsert: {
-                    Email: normalized,
-                    Subscribed_At: CurrentTimestamp()
-                }
-            },
-            {
-                upsert: true,
-                returnDocument: 'before',
-                includeResultMetadata: true
-            }
+        const created = await Insert<WaitlistInterface>(
+            WaitlistsTable,
+            { Email: normalized, Subscribed_At: CurrentTimestamp() },
+            'Email'
         )
 
-        const previous = result.value
+        const previous = created
+            ? null
+            : await FindOne<WaitlistInterface>(WaitlistsTable, {
+                  where: 'Email = ?',
+                  params: [normalized]
+              })
+
         const inserted = !previous
         const welcomed = Boolean(previous?.Metadata?.EmailId)
 
@@ -57,7 +56,7 @@ const JoinWaitlist = async (c: Context) => {
 
         try {
             if (!welcomed && retryable) {
-                const total = await WaitlistModel.countDocuments()
+                const total = await Count(WaitlistsTable)
 
                 const date = FormatDate(new Date())
 
@@ -72,11 +71,12 @@ const JoinWaitlist = async (c: Context) => {
                         : false
                 ])
 
+                const entry = created ?? previous
+
                 if (typeof messageId === 'string')
-                    await WaitlistModel.updateOne(
-                        { Email: normalized },
-                        { $set: { 'Metadata.EmailId': messageId } }
-                    )
+                    await Update(WaitlistsTable, entry?._id, {
+                        Metadata: { ...entry?.Metadata, EmailId: messageId }
+                    })
             }
         } catch (error) {
             Console.Error('JoinWaitlist', error)

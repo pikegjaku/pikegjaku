@@ -1,29 +1,51 @@
 import type { Context } from 'hono'
 import type { StatusCode } from 'hono/utils/http-status'
 
-import type {
-    
-    BloodGroupTypes,
-    PostTypes,
-    PostStatusTypes
-} from '@pikegjaku/shared/ts'
+import type { PostTypes } from '@pikegjaku/shared/ts'
 
-import type {
-    CityInterface,
-    CountryInterface,
-    UserInterface,
-    PostInterface,
-    VerificationInterface,
-    WaitlistInterface
-} from '@/ts'
+import type { UserInterface } from '@/ts'
 
-import type { MODELS, VERFICATIONS_TYPES } from '@/data/constants'
+import type { VERFICATIONS_TYPES } from '@/data/constants'
 
-export type RouteAuthLevel = 'public' | 'db' | 'user' | 'admin'
+export type RouteAuthLevel = 'public' | 'user' | 'admin'
 
 export type VerificationTypes =
     (typeof VERFICATIONS_TYPES)[keyof typeof VERFICATIONS_TYPES]
-export type ModelTypes = (typeof MODELS)[keyof typeof MODELS]
+
+export type ColumnKind = 'text' | 'number' | 'boolean' | 'date' | 'json'
+
+export type SqlValue = string | number | null
+
+export type CountRow = {
+    count: number
+}
+
+export type TableDefinition = {
+    name: string
+    columns: Record<string, ColumnKind>
+}
+
+export type TableReferences = Record<string, TableDefinition>
+
+export type SqlFilter = {
+    where: string
+    params: Array<unknown>
+}
+
+export type FindOptions = {
+    columns?: Array<string>
+    where?: string
+    params?: Array<unknown>
+    order?: string
+    skip?: unknown
+    limit?: unknown
+    references?: TableReferences
+}
+
+export type TimelineRow = {
+    day: string | null
+    count: number
+}
 
 export type HttpResponderFunctionProps = {
     c: Context
@@ -41,28 +63,12 @@ export type AuthTokenVerifierFunctionResponseTypes = {
     message: string
 }
 
-export type EncodedTokenData = {
-    userId: string
-}
-
 export type PostListFilterFunctionPropTypes = {
     user: UserInterface
     term: string | null
     city: null | string
     same_blood_group: boolean
     mode: PostTypes
-}
-
-export type PostsListFilterOptionTypes = {
-    Status: PostStatusTypes
-    City?: string
-    BloodGroup?: BloodGroupTypes
-    Type?: PostTypes
-    Title?: {
-        $regex: string
-        $options: string
-    }
-    Deleted?: { $ne: boolean }
 }
 
 export type RequestResponseTypes = {
@@ -75,14 +81,6 @@ export type RequestResponseTypes = {
 export type VerifyJwtTokenReturnType = {
     userId: string
 }
-
-export type Models =
-    | CityInterface
-    | CountryInterface
-    | UserInterface
-    | PostInterface
-    | VerificationInterface
-    | WaitlistInterface
 
 export type UploadToBucketFunctionProps = {
     path: string

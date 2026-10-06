@@ -1,18 +1,19 @@
 import type { Context } from 'hono'
+import type { UserInterface } from '@/ts'
 
-import { UserModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 import { CurrentTimestamp } from '@/data/dates'
 
 const UpdateUser = async (c: Context) => {
     try {
         const { id, fields } = await c.req.json()
 
-        const user = await UserModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const user = await FindOne<UserInterface>(UsersTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!user)
@@ -34,19 +35,27 @@ const UpdateUser = async (c: Context) => {
             'ProfileCompleted'
         ]
 
+        const changes: Record<string, unknown> = {}
+
         for (const key of Object.keys(fields)) {
             if (allowed.includes(key)) {
-                user.set(key, fields[key])
+                changes[key] = fields[key]
             }
         }
 
-        user.Updated_At = CurrentTimestamp()
-        await user.save()
+        await Update(UsersTable, user._id, {
+            ...changes,
+            Updated_At: CurrentTimestamp()
+        })
 
-        const updated = await UserModel.findById(id)
-            .populate(POPULATE.COUNTRY)
-            .populate(POPULATE.CITY)
-            .lean()
+        const updated = await FindOne<UserInterface>(UsersTable, {
+            where: '_id = ?',
+            params: [id],
+            references: {
+                Country: CountriesTable,
+                City: CitiesTable
+            }
+        })
 
         return await HttpResponder({
             c,

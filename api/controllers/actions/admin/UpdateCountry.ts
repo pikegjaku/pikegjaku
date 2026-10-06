@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { CountryInterface } from '@/ts'
 
-import { CountryModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CountriesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
@@ -9,9 +11,9 @@ const UpdateCountry = async (c: Context) => {
     try {
         const { id, fields } = await c.req.json()
 
-        const country = await CountryModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const country = await FindOne<CountryInterface>(CountriesTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!country)
@@ -25,16 +27,23 @@ const UpdateCountry = async (c: Context) => {
 
         const allowed = ['Name', 'Code']
 
+        const changes: Record<string, unknown> = {}
+
         for (const key of Object.keys(fields)) {
             if (allowed.includes(key)) {
-                country.set(key, fields[key])
+                changes[key] = fields[key]
             }
         }
 
-        country.Updated_At = CurrentTimestamp()
-        await country.save()
+        await Update(CountriesTable, country._id, {
+            ...changes,
+            Updated_At: CurrentTimestamp()
+        })
 
-        const updated = await CountryModel.findById(id).lean()
+        const updated = await FindOne<CountryInterface>(CountriesTable, {
+            where: '_id = ?',
+            params: [id]
+        })
 
         return await HttpResponder({
             c,

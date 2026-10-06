@@ -1,35 +1,25 @@
 import type { Context } from 'hono'
 import type { UserInterface, VerificationInterface } from '@/ts'
-import type { Document, QueryFilter } from 'mongoose'
 
-import { VerificationModel } from '@/data/models'
+import { Insert, Remove, Update } from '@/controllers/libs/d1'
+import { VerificationsTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CurrentTimestamp, TimestampPlusDays } from '@/data/dates'
 import { VerificationCodeGenerator } from '@/controllers/helpers/api'
 import { Console } from '@/controllers/helpers/logs'
 import { SendPhoneMessage } from '@/controllers/libs/sent'
 import { PhoneNumberValidation } from '@/controllers/helpers/validations'
-
-const COUNTRY_CODE_MAP: Record<string, string> = {
-    '+383': 'XK',
-    '+355': 'AL',
-    '+389': 'MK'
-}
+import { DIAL_CODE_COUNTRIES } from '@/data/constants'
 
 const StartPhoneVerification = async (
     c: Context,
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    user: Document<unknown, {}, UserInterface> &
-        UserInterface &
-        Required<{
-            _id: string
-        }>,
+    user: UserInterface,
     phoneNumber: string,
     countryCode?: string
 ) => {
     try {
         const dialCode = countryCode || '+383'
-        const countryKey = COUNTRY_CODE_MAP[dialCode] || 'XK'
+        const countryKey = DIAL_CODE_COUNTRIES[dialCode] || 'XK'
         const phoneValidation = PhoneNumberValidation(phoneNumber, countryKey)
 
         if (phoneValidation?.error)
@@ -45,20 +35,19 @@ const StartPhoneVerification = async (
             const phoneFormated = phoneNumber.replace('+', '')?.trim()
 
             if (code) {
-                await VerificationModel.deleteMany({
-                    User: user._id
-                } as QueryFilter<VerificationInterface>)
+                await Remove(VerificationsTable, {
+                    where: 'User = ?',
+                    params: [user._id]
+                })
 
-                const verificationObject = {
-                    Phone: phoneNumber,
-                    Code: code,
-                    User: user._id,
-                    Expires_At: TimestampPlusDays(15, 'minutes'),
-                    Generated_At: CurrentTimestamp()
-                }
-
-                const verification = await VerificationModel.create(
-                    verificationObject as unknown as Partial<VerificationInterface>
+                const verification = await Insert<VerificationInterface>(
+                    VerificationsTable,
+                    {
+                        Code: code,
+                        User: user._id,
+                        Expires_At: TimestampPlusDays(15, 'minutes'),
+                        Generated_At: CurrentTimestamp()
+                    }
                 )
 
                 if (verification) {
@@ -71,7 +60,9 @@ const StartPhoneVerification = async (
                     if (typeof id === 'string') {
                         verification.Metadata.MessageId = id
 
-                        await verification.save()
+                        await Update(VerificationsTable, verification._id, {
+                            Metadata: verification.Metadata
+                        })
 
                         return await HttpResponder({
                             c,

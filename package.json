@@ -19,8 +19,8 @@
         "api:dev": "cd api && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project server --env local -- bunx wrangler dev",
         "api:build": "cd api && bunx wrangler deploy --dry-run --outdir dist",
         "api:deploy": "cd api && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project server --env prod -- bun run scripts/deploy.ts",
-        "api:seed": "cd api && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project server --env local -- bun run scripts/seed-countries-cities.ts",
-        "api:indexes": "cd api && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project server --env local -- bun run scripts/build-indexes.ts",
+        "api:migrate": "cd api && bunx wrangler d1 migrations apply DB --local",
+        "api:seed": "cd api && bun run scripts/seed-countries-cities.ts",
         "api:exec": "cd api && ../node_modules/.bin/envless run --workspace bfzli --product pikegjaku --project server --env local --",
         "api:types": "cd api && bunx wrangler types",
         "api:tsc": "cd api && tsc",
@@ -65,6 +65,7 @@
         "globals": "^17.6.0",
         "husky": "^9.1.5",
         "prettier": "^3.8.1",
+        "typescript": "^5.9.3",
         "typescript-eslint": "^8.57.2"
     },
     "dependencies": {

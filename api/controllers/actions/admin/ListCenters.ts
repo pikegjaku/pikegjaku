@@ -1,33 +1,31 @@
 import type { Context } from 'hono'
+import type { CenterInterface } from '@/ts'
 
-import { CenterModel } from '@/data/models'
+import { Count, Find } from '@/controllers/libs/d1'
+import { CentersTable, CitiesTable, CountriesTable } from '@/data/tables'
+import { ListFilter } from '@/controllers/filters'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { MAX_ENTITY_ITEMS, POPULATE } from '@/data/constants'
+import { MAX_ENTITY_ITEMS } from '@/data/constants'
 
 const ListCenters = async (c: Context) => {
     try {
         const { skip, limit, term } = await c.req.json()
 
-        const filters: Record<string, unknown> = {
-            Deleted: { $ne: true }
-        }
-
-        if (term) {
-            filters.Name = { $regex: term, $options: 'i' }
-        }
+        const filters = ListFilter(term, ['Name'])
 
         const [count, centers] = await Promise.all([
-            CenterModel.countDocuments(filters),
-            CenterModel.find(filters)
-                .populate(POPULATE.CITY)
-                .populate(POPULATE.COUNTRY)
-                .sort({ Name: 1, _id: 1 })
-                .skip(skip || 0)
-                .limit(
-                    limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20
-                )
-                .lean()
+            Count(CentersTable, filters),
+            Find<CenterInterface>(CentersTable, {
+                ...filters,
+                order: 'Name ASC, _id ASC',
+                skip: skip || 0,
+                limit: limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit || 20,
+                references: {
+                    City: CitiesTable,
+                    Country: CountriesTable
+                }
+            })
         ])
 
         if (centers) {

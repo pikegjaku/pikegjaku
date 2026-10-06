@@ -1,4 +1,6 @@
 {
-    "ignore": ["node_modules", "dist"],
-    "ignoreDependencies": ["cloudflare", "wrangler"]
+    "entry": ["scripts/*.ts"],
+    "project": ["**/*.ts"],
+    "ignoreBinaries": ["eslint", "tsc"],
+    "ignoreDependencies": ["@pikegjaku/shared", "cloudflare", "wrangler"]
 }

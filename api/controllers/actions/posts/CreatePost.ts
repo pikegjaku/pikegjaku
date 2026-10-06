@@ -1,13 +1,14 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CurrentTimestamp } from '@/data/dates'
-import { CountryModel, PostModel, CityModel } from '@/data/models'
+import { FindOne, Increment, Insert, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { Console } from '@/controllers/helpers/logs'
-import { ObjectId } from '@/controllers/libs/mongo'
 import { PostListSelector } from '@/data/constants/Selectors'
 import { GetCities, GetCountries } from '@/controllers/helpers/entities'
-import { POPULATE, POST_TYPES } from '@/data/constants'
+import { POST_TYPES } from '@/data/constants'
 
 import {
     BloodGroupValidation,
@@ -68,10 +69,10 @@ const CreatePost = async (c: Context) => {
                     countryValidation.error
 
                 if (!isError) {
-                    const post = new PostModel({
+                    const post = await Insert<PostInterface>(PostsTable, {
                         Title,
                         Description,
-                        City: ObjectId(City),
+                        City,
                         Type,
                         Country,
                         User,
@@ -82,27 +83,25 @@ const CreatePost = async (c: Context) => {
                         Updated_At: CurrentTimestamp()
                     })
 
-                    await post.save()
-
                     await Promise.all([
-                        CityModel.findByIdAndUpdate(City, {
-                            $inc: { Posts: 1 }
-                        }),
-                        CountryModel.findByIdAndUpdate(Country, {
-                            $inc: { Posts: 1 }
-                        })
+                        Increment(CitiesTable, City, 'Posts', 1),
+                        Increment(CountriesTable, Country, 'Posts', 1)
                     ])
 
                     user.Posts += 1
 
-                    await user.save()
+                    await Update(UsersTable, user._id, { Posts: user.Posts })
 
-                    const newPost = await PostModel.findOne({ _id: post?._id })
-                        .populate(POPULATE.USER)
-                        .populate(POPULATE.COUNTRY)
-                        .populate(POPULATE.CITY)
-                        .select(PostListSelector)
-                        .lean()
+                    const newPost = await FindOne<PostInterface>(PostsTable, {
+                        columns: PostListSelector,
+                        where: '_id = ?',
+                        params: [post?._id],
+                        references: {
+                            User: UsersTable,
+                            Country: CountriesTable,
+                            City: CitiesTable
+                        }
+                    })
 
                     if (newPost)
                         return await HttpResponder({

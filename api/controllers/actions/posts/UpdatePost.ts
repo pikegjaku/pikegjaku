@@ -1,13 +1,14 @@
 import type { Context } from 'hono'
+import type { CityInterface, CountryInterface, PostInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CurrentTimestamp } from '@/data/dates'
-import { ObjectId } from '@/controllers/libs/mongo'
-import { CountryModel, PostModel, CityModel } from '@/data/models'
+import { FindOne, Increment, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { Console } from '@/controllers/helpers/logs'
 import { PostListSelector } from '@/data/constants/Selectors'
 import { GetCities, GetCountries } from '@/controllers/helpers/entities'
-import { POPULATE, POST_STATUSES } from '@/data/constants'
+import { POST_STATUSES } from '@/data/constants'
 
 import {
     BloodGroupValidation,
@@ -67,55 +68,50 @@ const UpdatePost = async (c: Context) => {
                     countryValidation.error
 
                 if (!isError) {
-                    const post = await PostModel.findOne({
-                        _id: PostId,
-                        Deleted: { $ne: true }
+                    const post = await FindOne<PostInterface>(PostsTable, {
+                        where: '_id = ? AND Deleted IS NOT 1',
+                        params: [PostId]
                     })
 
                     if (post) {
+                        const isOwner =
+                            post?.User?.toString() === user?._id?.toString()
                         const allowed = post?.Status === POST_STATUSES.APPROVED
 
+                        if (!isOwner)
+                            return await HttpResponder({
+                                c,
+                                success: false,
+                                message: 'Përdoruesi nuk është i autorizuar të përditësojë këtë postim.',
+                                data: null,
+                                code: 401
+                            })
+
                         if (allowed) {
-                            const city = await CityModel.findById(City)
-                            const country = await CountryModel.findById(Country)
+                            const city = await FindOne<CityInterface>(
+                                CitiesTable,
+                                { where: '_id = ?', params: [City] }
+                            )
+                            const country = await FindOne<CountryInterface>(
+                                CountriesTable,
+                                { where: '_id = ?', params: [Country] }
+                            )
 
                             if (
                                 country &&
                                 country?._id !== post.Country.toString()
                             ) {
-                                country.Posts += 1
-                                await country.save()
+                                await Increment(CountriesTable, country._id, 'Posts', 1)
+                                await Increment(CountriesTable, post.Country, 'Posts', -1)
 
-                                const oldCountry = await CountryModel.findById(
-                                    post.Country
-                                )
-                                const countryId = ObjectId(Country)
-
-                                if (oldCountry) {
-                                    oldCountry.Posts -= 1
-                                    await oldCountry.save()
-                                }
-
-                                // @ts-expect-error - It thinks that it needs the full object
-                                if (countryId) post.Country = countryId
+                                post.Country = Country
                             }
 
                             if (city && city?._id !== post.City.toString()) {
-                                city.Posts += 1
-                                await city.save()
+                                await Increment(CitiesTable, city._id, 'Posts', 1)
+                                await Increment(CitiesTable, post.City, 'Posts', -1)
 
-                                const oldCity = await CityModel.findById(
-                                    post.City
-                                )
-                                const cityId = ObjectId(City)
-
-                                if (oldCity) {
-                                    oldCity.Posts -= 1
-                                    await oldCity.save()
-                                }
-
-                                // @ts-expect-error - It thinks that it needs the full object
-                                if (cityId) post.City = cityId
+                                post.City = City
                             }
 
                             post.Title = Title
@@ -125,17 +121,30 @@ const UpdatePost = async (c: Context) => {
                             post.Urgent = Urgent
                             post.Updated_At = CurrentTimestamp()
 
-                            await post.save()
-                            await user.save()
-
-                            const newPost = await PostModel.findOne({
-                                _id: post?._id
+                            await Update(PostsTable, post._id, {
+                                Country: post.Country,
+                                City: post.City,
+                                Title: post.Title,
+                                Description: post.Description,
+                                Type: post.Type,
+                                BloodGroup: post.BloodGroup,
+                                Urgent: post.Urgent,
+                                Updated_At: post.Updated_At
                             })
-                                .populate(POPULATE.USER)
-                                .populate(POPULATE.COUNTRY)
-                                .populate(POPULATE.CITY)
-                                .select(PostListSelector)
-                                .lean()
+
+                            const newPost = await FindOne<PostInterface>(
+                                PostsTable,
+                                {
+                                    columns: PostListSelector,
+                                    where: '_id = ?',
+                                    params: [post?._id],
+                                    references: {
+                                        User: UsersTable,
+                                        Country: CountriesTable,
+                                        City: CitiesTable
+                                    }
+                                }
+                            )
 
                             if (newPost)
                                 return await HttpResponder({
@@ -153,7 +162,14 @@ const UpdatePost = async (c: Context) => {
                                     data: null,
                                     code: 500
                                 })
-                        }
+                        } else
+                            return await HttpResponder({
+                                c,
+                                success: false,
+                                message: 'Postimi nuk mund të përditësohet sepse kërkesa është përmbushur.',
+                                data: null,
+                                code: 403
+                            })
                     } else
                         return await HttpResponder({
                             c,

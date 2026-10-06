@@ -1,22 +1,24 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
-import { PostModel } from '@/data/models'
+import { FindOne } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 
 const DetailPost = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const post = await PostModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const post = await FindOne<PostInterface>(PostsTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id],
+            references: {
+                User: UsersTable,
+                Country: CountriesTable,
+                City: CitiesTable
+            }
         })
-            .populate(POPULATE.USER)
-            .populate(POPULATE.COUNTRY)
-            .populate(POPULATE.CITY)
-            .lean()
 
         if (post)
             return await HttpResponder({

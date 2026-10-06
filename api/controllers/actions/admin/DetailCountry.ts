@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { CountryInterface } from '@/ts'
 
-import { CountryModel } from '@/data/models'
+import { FindOne } from '@/controllers/libs/d1'
+import { CountriesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 
@@ -8,10 +10,10 @@ const DetailCountry = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const country = await CountryModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
-        }).lean()
+        const country = await FindOne<CountryInterface>(CountriesTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
+        })
 
         if (country)
             return await HttpResponder({

@@ -1,6 +1,6 @@
 import { env } from 'cloudflare:workers'
 import Client from '@/controllers/libs/openemail/Client'
-import WelcomeTemplate from '@/controllers/libs/openemail/templates/WelcomeTemplate'
+import { WelcomeTemplate } from '@/controllers/libs/openemail/templates'
 import Console from '@/controllers/helpers/logs/Console'
 
 const SendWelcomeEmail = async (email: string): Promise<false | string> => {

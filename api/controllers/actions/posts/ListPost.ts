@@ -1,9 +1,10 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
-import { PostModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 
 const ListPost = async (c: Context) => {
     try {
@@ -12,19 +13,19 @@ const ListPost = async (c: Context) => {
         if (user) {
             const { postId } = await c.req.json()
 
-            const filter = {
-                _id: postId,
-                Deleted: { $ne: true }
-            }
-
-            const post = await PostModel.findOne(filter)
-                .populate(POPULATE.USER)
-                .populate(POPULATE.COUNTRY)
-                .populate(POPULATE.CITY)
+            const post = await FindOne<PostInterface>(PostsTable, {
+                where: '_id = ? AND Deleted IS NOT 1',
+                params: [postId],
+                references: {
+                    User: UsersTable,
+                    Country: CountriesTable,
+                    City: CitiesTable
+                }
+            })
 
             if (post) {
                 post.Views = post.Views + 1
-                await post.save()
+                await Update(PostsTable, post._id, { Views: post.Views })
 
                 return await HttpResponder({
                     c,

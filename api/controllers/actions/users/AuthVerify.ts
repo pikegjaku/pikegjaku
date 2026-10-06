@@ -3,6 +3,8 @@ import type { Context } from 'hono'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
+import { Update } from '@/controllers/libs/d1'
+import { UsersTable } from '@/data/tables'
 
 const AuthVerify = async (c: Context) => {
     try {
@@ -14,7 +16,10 @@ const AuthVerify = async (c: Context) => {
             user.Last_Active = CurrentTimestamp()
             user.Visits = user.Visits + 1
 
-            await user.save()
+            await Update(UsersTable, user._id, {
+                Last_Active: user.Last_Active,
+                Visits: user.Visits
+            })
 
             return await HttpResponder({
                 c,
@@ -22,7 +27,7 @@ const AuthVerify = async (c: Context) => {
                 message: 'Përdoruesi u verifikua me sukses dhe u ngarkua.',
                 code: 200,
                 data: {
-                    ...user._doc,
+                    ...user,
                     Token: token,
                     Refresh: refresh
                 }

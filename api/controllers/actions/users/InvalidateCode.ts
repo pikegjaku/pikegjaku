@@ -1,8 +1,8 @@
 import type { Context } from 'hono'
-import type { QueryFilter } from 'mongoose'
-import type { VerificationInterface } from '@/ts'
+import type { UserInterface, VerificationInterface } from '@/ts'
 
-import { UserModel, VerificationModel } from '@/data/models'
+import { FindOne, Remove } from '@/controllers/libs/d1'
+import { UsersTable, VerificationsTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 
@@ -10,22 +10,22 @@ const InvalidateCode = async (c: Context) => {
     try {
         const { phoneNumber } = await c.req.json()
 
-        const phoneNumberNumeric =
-            typeof phoneNumber === 'string'
-                ? parseInt(phoneNumber)
-                : phoneNumber
-        const user = await UserModel.findOne({
-            Phone: phoneNumberNumeric,
-            Deleted: { $ne: true }
+        const user = await FindOne<UserInterface>(UsersTable, {
+            where: 'Phone = ? AND Deleted IS NOT 1',
+            params: [phoneNumber]
         })
 
         if (user) {
-            const verification = await VerificationModel.findOne({
-                User: user?._id
-            } as QueryFilter<VerificationInterface>)
+            const verification = await FindOne<VerificationInterface>(
+                VerificationsTable,
+                { where: 'User = ?', params: [user?._id] }
+            )
 
             if (verification) {
-                await verification.deleteOne()
+                await Remove(VerificationsTable, {
+                    where: '_id = ?',
+                    params: [verification._id]
+                })
 
                 return await HttpResponder({
                     c,

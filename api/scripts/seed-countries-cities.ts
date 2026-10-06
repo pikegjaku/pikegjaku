@@ -1,80 +1,66 @@
-import type { QueryFilter } from 'mongoose'
-import type { CityInterface } from '@/ts'
-
-import mongoose from 'mongoose'
-import { env } from '@goenvless/env/server'
-import { CityModel, CountryModel } from '@/data/models'
+import { spawn } from 'node:child_process'
+import { rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+import NewId from '@/controllers/libs/d1/NewId'
 import { Console } from '@/controllers/helpers/logs'
 import { Slugify } from '@/controllers/helpers/generals'
 import { CurrentTimestamp } from '@/data/dates'
 import { Locations } from '@/data/seed'
-import { MONGO_OPTIONS } from '@/data/constants'
+
+const Quote = (value: string | number): string =>
+    typeof value === 'number' ? String(value) : `'${value.replace(/'/g, "''")}'`
+
+const Execute = (command: string): Promise<number> =>
+    new Promise((resolve) =>
+        spawn(command, { shell: true, stdio: 'inherit' }).on('close', (code) =>
+            resolve(code ?? 1)
+        )
+    )
 
 const Run = async () => {
-    await mongoose.connect(env.DATABASE_URL, MONGO_OPTIONS)
-
-    let countriesCreated = 0
-    let citiesCreated = 0
+    const target = process.argv.includes('--remote') ? '--remote' : '--local'
+    const now = Quote(CurrentTimestamp().toISOString())
+    const statements: Array<string> = []
 
     for (const location of Locations) {
-        const now = CurrentTimestamp()
-
-        await CountryModel.updateOne(
-            { Name: location.Name },
-            {
-                $setOnInsert: {
-                    Name: location.Name,
-                    Code: location.Code,
-                    Created_At: now
-                },
-                $set: { Updated_At: now }
-            },
-            { upsert: true }
+        statements.push(
+            `INSERT INTO countries (_id, Name, Code, Created_At, Updated_At) VALUES (${Quote(NewId())}, ${Quote(location.Name)}, ${Quote(location.Code)}, ${now}, ${now}) ON CONFLICT (Name) DO UPDATE SET Updated_At = excluded.Updated_At;`
         )
 
-        const country = await CountryModel.findOne({ Name: location.Name })
-
-        if (!country) continue
-
-        for (const name of location.Cities) {
-            const result = await CityModel.updateOne(
-                { Name: name },
-                {
-                    $setOnInsert: {
-                        Name: name,
-                        Value: Slugify(name),
-                        Country: country._id,
-                        Created_At: now
-                    },
-                    $set: { Updated_At: now }
-                },
-                { upsert: true }
+        for (const name of location.Cities)
+            statements.push(
+                `INSERT INTO cities (_id, Name, Value, Country, Created_At, Updated_At) VALUES (${Quote(NewId())}, ${Quote(name)}, ${Quote(Slugify(name))}, (SELECT _id FROM countries WHERE Name = ${Quote(location.Name)}), ${now}, ${now}) ON CONFLICT (Name) DO UPDATE SET Updated_At = excluded.Updated_At;`
             )
-
-            if (result.upsertedCount > 0) citiesCreated += 1
-        }
-
-        const total = await CityModel.countDocuments({
-            Country: country._id,
-            Deleted: { $ne: true }
-        } as QueryFilter<CityInterface>)
-
-        await CountryModel.updateOne(
-            { _id: country._id },
-            { $set: { Cities: total, Updated_At: now } }
-        )
-
-        countriesCreated += 1
-
-        Console.Info('SeedCountriesCities', `${location.Name}: ${total} qytete`)
     }
+
+    statements.push(
+        `UPDATE countries SET Cities = (SELECT COUNT(*) FROM cities WHERE cities.Country = countries._id AND cities.Deleted IS NOT 1), Updated_At = ${now};`
+    )
+
+    const file = join(tmpdir(), `pikegjaku-seed-${NewId()}.sql`)
+
+    await writeFile(file, statements.join('\n'))
+
+    let code = 0
+
+    try {
+        code = await Execute(`bunx wrangler d1 migrations apply DB ${target}`)
+
+        if (code === 0)
+            code = await Execute(
+                `bunx wrangler d1 execute DB ${target} --file ${file}`
+            )
+    } finally {
+        await rm(file, { force: true })
+    }
+
+    if (code !== 0) process.exit(code)
 
     Console.Info(
         'SeedCountriesCities',
-        `${countriesCreated} shtete, ${citiesCreated} qytete të reja`
+        `${Locations.length} shtete, ${Locations.reduce((total, location) => total + location.Cities.length, 0)} qytete`
     )
-
-    await mongoose.disconnect()
 }
 
 try {

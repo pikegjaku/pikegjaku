@@ -1,11 +1,13 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
-import { PostModel } from '@/data/models'
+import { Count, Find } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { PostsListFilter } from '@/controllers/filters'
 import { PostListSelector } from '@/data/constants/Selectors'
-import { MAX_ENTITY_ITEMS, POPULATE } from '@/data/constants'
+import { MAX_ENTITY_ITEMS } from '@/data/constants'
 
 const ListPosts = async (c: Context) => {
     try {
@@ -24,16 +26,19 @@ const ListPosts = async (c: Context) => {
             })
 
             const [count, posts] = await Promise.all([
-                PostModel.countDocuments(filters),
-                PostModel.find(filters)
-                    .populate(POPULATE.USER)
-                    .populate(POPULATE.COUNTRY)
-                    .populate(POPULATE.CITY)
-                    .select(PostListSelector)
-                    .sort({ Urgent: -1, Created_At: -1, _id: 1 })
-                    .skip(skip)
-                    .limit(limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit)
-                    .lean()
+                Count(PostsTable, filters),
+                Find<PostInterface>(PostsTable, {
+                    ...filters,
+                    columns: PostListSelector,
+                    order: 'Urgent DESC, Created_At DESC, _id ASC',
+                    skip,
+                    limit: limit > MAX_ENTITY_ITEMS ? MAX_ENTITY_ITEMS : limit,
+                    references: {
+                        User: UsersTable,
+                        Country: CountriesTable,
+                        City: CitiesTable
+                    }
+                })
             ])
 
             if (posts) {

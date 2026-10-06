@@ -1,16 +1,17 @@
 import type { Context } from 'hono'
+import type { CenterInterface } from '@/ts'
 
-import { CenterModel } from '@/data/models'
+import { FindOne, Insert } from '@/controllers/libs/d1'
+import { CentersTable, CitiesTable, CountriesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 import { CurrentTimestamp } from '@/data/dates'
 
 const CreateCenter = async (c: Context) => {
     try {
         const { Name, Address, Phone, City, Country } = await c.req.json()
 
-        if (!Name)
+        if (!Name || !Address || !Phone || !City || !Country)
             return await HttpResponder({
                 c,
                 success: false,
@@ -19,19 +20,24 @@ const CreateCenter = async (c: Context) => {
                 code: 400
             })
 
-        const center = await CenterModel.create({
+        const center = await Insert<CenterInterface>(CentersTable, {
             Name,
-            Address: Address || null,
-            Phone: Phone || null,
-            City: City || null,
-            Country: Country || null,
-            Created_At: CurrentTimestamp()
+            Address,
+            Phone,
+            City,
+            Country,
+            Created_At: CurrentTimestamp(),
+            Updated_At: CurrentTimestamp()
         })
 
-        const populated = await CenterModel.findById(center._id)
-            .populate(POPULATE.CITY)
-            .populate(POPULATE.COUNTRY)
-            .lean()
+        const populated = await FindOne<CenterInterface>(CentersTable, {
+            where: '_id = ?',
+            params: [center?._id],
+            references: {
+                City: CitiesTable,
+                Country: CountriesTable
+            }
+        })
 
         return await HttpResponder({
             c,

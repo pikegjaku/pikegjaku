@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { CityInterface } from '@/ts'
 
-import { CityModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CitiesTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 import { CurrentTimestamp } from '@/data/dates'
@@ -9,23 +11,26 @@ const DeleteCity = async (c: Context) => {
     try {
         const { id } = await c.req.json()
 
-        const city = await CityModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const city = await FindOne<CityInterface>(CitiesTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!city)
             return await HttpResponder({
                 c,
                 success: false,
-                message: 'Qendra nuk mund tu merrte.',
+                message: 'Qyteti nuk mund tu merrte.',
                 data: null,
                 code: 404
             })
 
         city.Deleted = true
         city.Deleted_At = CurrentTimestamp()
-        await city.save()
+        await Update(CitiesTable, city._id, {
+            Deleted: city.Deleted,
+            Deleted_At: city.Deleted_At
+        })
 
         return await HttpResponder({
             c,

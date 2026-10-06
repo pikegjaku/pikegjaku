@@ -1,18 +1,19 @@
 import type { Context } from 'hono'
+import type { PostInterface } from '@/ts'
 
-import { PostModel } from '@/data/models'
+import { FindOne, Update } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
-import { POPULATE } from '@/data/constants'
 import { CurrentTimestamp } from '@/data/dates'
 
 const UpdatePost = async (c: Context) => {
     try {
         const { id, fields } = await c.req.json()
 
-        const post = await PostModel.findOne({
-            _id: id,
-            Deleted: { $ne: true }
+        const post = await FindOne<PostInterface>(PostsTable, {
+            where: '_id = ? AND Deleted IS NOT 1',
+            params: [id]
         })
 
         if (!post)
@@ -26,20 +27,28 @@ const UpdatePost = async (c: Context) => {
 
         const allowed = ['Title', 'Description', 'Status', 'Urgent']
 
+        const changes: Record<string, unknown> = {}
+
         for (const key of Object.keys(fields)) {
             if (allowed.includes(key)) {
-                post.set(key, fields[key])
+                changes[key] = fields[key]
             }
         }
 
-        post.Updated_At = CurrentTimestamp()
-        await post.save()
+        await Update(PostsTable, post._id, {
+            ...changes,
+            Updated_At: CurrentTimestamp()
+        })
 
-        const updated = await PostModel.findById(id)
-            .populate(POPULATE.USER)
-            .populate(POPULATE.CITY)
-            .populate(POPULATE.COUNTRY)
-            .lean()
+        const updated = await FindOne<PostInterface>(PostsTable, {
+            where: '_id = ?',
+            params: [id],
+            references: {
+                User: UsersTable,
+                City: CitiesTable,
+                Country: CountriesTable
+            }
+        })
 
         return await HttpResponder({
             c,

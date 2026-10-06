@@ -1,7 +1,5 @@
-import { Gateway, Server } from '@/controllers/libs/workers'
-
-export { Server }
+import { App } from '@/router'
 
 export default {
-    fetch: Gateway
+    fetch: App.fetch
 } satisfies ExportedHandler<Env>

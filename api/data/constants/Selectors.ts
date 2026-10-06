@@ -1,28 +1,16 @@
-export const PostListSelector = {
-    _id: 1,
-    Title: 1,
-    BloodGroup: 1,
-    Status: 1,
-    City: 1,
-    Country: 1,
-    User: 1,
-    Description: 1,
-    Type: 1,
-    Active: 1,
-    Created_At: 1
-}
+export const PostListSelector = [
+    '_id',
+    'Title',
+    'BloodGroup',
+    'Status',
+    'City',
+    'Country',
+    'User',
+    'Description',
+    'Type',
+    'Created_At'
+]
 
-export const CityListSelector = {
-    Name: 1,
-    Value: 1,
-    Posts: 1,
-    Users: 1
-}
+export const CityListSelector = ['_id', 'Name', 'Value', 'Posts', 'Users']
 
-export const CountryListSelector = {
-    Name: 1,
-    Posts: 1,
-    Users: 1,
-    Cities: 1,
-    Code: 1
-}
+export const CountryListSelector = ['_id', 'Name', 'Posts', 'Users', 'Cities', 'Code']

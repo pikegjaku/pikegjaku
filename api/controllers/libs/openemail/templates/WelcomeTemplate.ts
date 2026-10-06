@@ -1,5 +1,5 @@
 import EmailLayout from '@/controllers/libs/openemail/templates/EmailLayout'
-import EscapeHtml from '@/controllers/helpers/generals/EscapeHtml'
+import { EscapeHtml } from '@/controllers/helpers/generals'
 import { BRAND } from '@/data/constants'
 
 const WelcomeTemplate = (email: string): string => {

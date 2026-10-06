@@ -1,34 +1,27 @@
-import type { QueryFilter } from 'mongoose'
-import type {
-    PostInterface,
-    PostListFilterFunctionPropTypes,
-    PostsListFilterOptionTypes
-} from '@/ts'
+import type { PostListFilterFunctionPropTypes, SqlFilter } from '@/ts'
 
+import ListFilter from '@/controllers/filters/ListFilter'
 import { POST_STATUSES, POST_TYPES } from '@/data/constants'
 
-const PostsListFilter = (
-    props: PostListFilterFunctionPropTypes
-): QueryFilter<PostInterface> => {
+const PostsListFilter = (props: PostListFilterFunctionPropTypes): SqlFilter => {
     const { user, term, city, same_blood_group } = props
 
-    const filters: PostsListFilterOptionTypes = {
-        Status: POST_STATUSES.APPROVED,
-        Deleted: { $ne: true }
+    const { where, params } = ListFilter(term, ['Title'])
+
+    const conditions = ['Status = ?', where, 'Type = ?']
+    const values: Array<unknown> = [POST_STATUSES.APPROVED, ...params, POST_TYPES.BLOOD]
+
+    if (city) {
+        conditions.push('City IS ?')
+        values.push(user?.City)
     }
 
-    if (term)
-        filters['Title'] = {
-            $regex: term,
-            $options: 'i'
-        }
+    if (same_blood_group) {
+        conditions.push('BloodGroup IS ?')
+        values.push(user.BloodGroup)
+    }
 
-    filters['Type'] = POST_TYPES.BLOOD
-
-    if (city) filters['City'] = user?.City._id
-    if (same_blood_group) filters['BloodGroup'] = user.BloodGroup
-
-    return filters as QueryFilter<PostInterface>
+    return { where: conditions.join(' AND '), params: values }
 }
 
 export default PostsListFilter

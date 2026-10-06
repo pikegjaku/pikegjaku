@@ -1,6 +1,8 @@
 import type { Context } from 'hono'
+import type { TableDefinition, TimelineRow } from '@/ts'
 
-import { UserModel, PostModel, CityModel, CountryModel } from '@/data/models'
+import { Count, Query } from '@/controllers/libs/d1'
+import { CitiesTable, CountriesTable, PostsTable, UsersTable } from '@/data/tables'
 import { HttpResponder } from '@/controllers/helpers/http'
 import { Console } from '@/controllers/helpers/logs'
 
@@ -22,26 +24,20 @@ const getPeriodDate = (period: string): Date | null => {
 }
 
 const getTimeline = async (
-    model: typeof UserModel | typeof PostModel,
+    table: TableDefinition,
     dateField: string,
     fromDate: Date | null
 ) => {
-    const match: Record<string, unknown> = { Deleted: { $ne: true } }
+    const conditions = ['Deleted IS NOT 1']
 
-    if (fromDate) match[dateField] = { $gte: fromDate }
+    if (fromDate) conditions.push(`${dateField} >= ?`)
 
-    return await model.aggregate([
-        { $match: match },
-        {
-            $group: {
-                _id: {
-                    $dateToString: { format: '%Y-%m-%d', date: `$${dateField}` }
-                },
-                count: { $sum: 1 }
-            }
-        },
-        { $sort: { _id: 1 } }
-    ])
+    const rows = await Query<TimelineRow>(
+        `SELECT substr(${dateField}, 1, 10) AS day, COUNT(*) AS count FROM ${table.name} WHERE ${conditions.join(' AND ')} GROUP BY day ORDER BY day ASC`,
+        fromDate ? [fromDate] : []
+    )
+
+    return rows.map(({ day, count }) => ({ _id: day, count }))
 }
 
 const Stats = async (c: Context) => {
@@ -49,20 +45,23 @@ const Stats = async (c: Context) => {
         const { period } = await c.req.json()
         const fromDate = getPeriodDate(period || 'all')
 
-        const dateFilter: Record<string, unknown> = {
-            Deleted: { $ne: true }
+        const dateFilter = {
+            where: fromDate
+                ? 'Deleted IS NOT 1 AND Created_At >= ?'
+                : 'Deleted IS NOT 1',
+            params: fromDate ? [fromDate] : []
         }
 
-        if (fromDate) dateFilter.Created_At = { $gte: fromDate }
+        const activeFilter = { where: 'Deleted IS NOT 1', params: [] }
 
         const [users, posts, cities, countries, usersTimeline, postsTimeline] =
             await Promise.all([
-                UserModel.countDocuments(dateFilter),
-                PostModel.countDocuments(dateFilter),
-                CityModel.countDocuments({ Deleted: { $ne: true } }),
-                CountryModel.countDocuments({ Deleted: { $ne: true } }),
-                getTimeline(UserModel, 'Created_At', fromDate),
-                getTimeline(PostModel, 'Created_At', fromDate)
+                Count(UsersTable, dateFilter),
+                Count(PostsTable, dateFilter),
+                Count(CitiesTable, activeFilter),
+                Count(CountriesTable, activeFilter),
+                getTimeline(UsersTable, 'Created_At', fromDate),
+                getTimeline(PostsTable, 'Created_At', fromDate)
             ])
 
         return await HttpResponder({

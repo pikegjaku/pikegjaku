@@ -1,24 +1,25 @@
 import type { Context } from 'hono'
-import type { QueryFilter } from 'mongoose'
-import type { CityInterface, CountryInterface } from '@/ts'
+import type { PostInterface } from '@/ts'
 
 import { HttpResponder } from '@/controllers/helpers/http'
 import { CalculateTime, CurrentTimestamp } from '@/data/dates'
 import { Console } from '@/controllers/helpers/logs'
+import { Find, Increment, Remove, Update } from '@/controllers/libs/d1'
 
 import {
-    CityModel,
-    CountryModel,
-    PostModel,
-    VerificationModel
-} from '@/data/models'
+    CitiesTable,
+    CountriesTable,
+    PostsTable,
+    UsersTable,
+    VerificationsTable
+} from '@/data/tables'
 
 const CloseAccount = async (c: Context) => {
     try {
         const user = c.get('user')
 
         if (user) {
-            const { days } = CalculateTime(CurrentTimestamp(), user?.Created_At)
+            const { days } = CalculateTime(user?.Created_At, CurrentTimestamp())
 
             const isNewUser = days < 7
 
@@ -31,70 +32,47 @@ const CloseAccount = async (c: Context) => {
                     code: 403
                 })
             else {
-                const posts = await PostModel.find({
-                    User: user._id,
-                    Deleted: { $ne: true }
+                const posts = await Find<PostInterface>(PostsTable, {
+                    where: 'User = ? AND Deleted IS NOT 1',
+                    params: [user._id]
                 })
 
                 for (const post of posts) {
-                    await CountryModel.updateOne(
-                        { _id: post.Country } as QueryFilter<CountryInterface>,
-                        {
-                            $inc: {
-                                Posts: -1
-                            },
-                            $set: {
-                                Updated_At: CurrentTimestamp()
-                            }
-                        }
-                    )
+                    await Increment(CountriesTable, post.Country, 'Posts', -1, {
+                        Updated_At: CurrentTimestamp()
+                    })
 
-                    await CityModel.updateOne(
-                        { _id: post.City } as QueryFilter<CityInterface>,
-                        {
-                            $inc: {
-                                Posts: -1
-                            },
-                            $set: {
-                                Updated_At: CurrentTimestamp()
-                            }
-                        }
-                    )
+                    await Increment(CitiesTable, post.City, 'Posts', -1, {
+                        Updated_At: CurrentTimestamp()
+                    })
 
                     post.Deleted = true
                     post.Deleted_At = CurrentTimestamp()
-                    await post.save()
+                    await Update(PostsTable, post._id, {
+                        Deleted: post.Deleted,
+                        Deleted_At: post.Deleted_At
+                    })
                 }
 
-                await CountryModel.updateOne(
-                    { _id: user.Country },
-                    {
-                        $inc: {
-                            Users: -1
-                        },
-                        $set: {
-                            Updated_At: CurrentTimestamp()
-                        }
-                    }
-                )
+                await Increment(CountriesTable, user.Country, 'Users', -1, {
+                    Updated_At: CurrentTimestamp()
+                })
 
-                await CityModel.updateOne(
-                    { _id: user.City },
-                    {
-                        $inc: {
-                            Users: -1
-                        },
-                        $set: {
-                            Updated_At: CurrentTimestamp()
-                        }
-                    }
-                )
+                await Increment(CitiesTable, user.City, 'Users', -1, {
+                    Updated_At: CurrentTimestamp()
+                })
 
-                await VerificationModel.deleteMany({ User: user._id })
+                await Remove(VerificationsTable, {
+                    where: 'User = ?',
+                    params: [user._id]
+                })
 
                 user.Deleted = true
                 user.Deleted_At = CurrentTimestamp()
-                await user.save()
+                await Update(UsersTable, user._id, {
+                    Deleted: user.Deleted,
+                    Deleted_At: user.Deleted_At
+                })
 
                 return await HttpResponder({
                     c,
