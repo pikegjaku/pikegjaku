@@ -19,7 +19,7 @@ const BloodGroupValidation = (group: string | null): ValidationReturnType => {
         BloodGroupEnum.parse(group)
     } catch {
         return {
-            message: 'Blood group type is invalid!',
+            message: 'Grupi i gjakut nuk është i vlefshëm!',
             error: true
         }
     }

@@ -1,22 +1,30 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
+import VALIDATION_LIMITS from '@pikegjaku/shared/validations/ValidationLimits'
+
 const PostDescriptionValidation = (
     description: string
 ): ValidationReturnType => {
-    const minLengthCase = z.string().min(32).safeParse(description)
+    const minLengthCase = z
+        .string()
+        .min(VALIDATION_LIMITS.POST_DESCRIPTION.MIN)
+        .safeParse(description)
 
     if (!minLengthCase.success)
         return {
-            message: 'Përshkrimi duhet të jetë më i gjatë se 32 karaktere!',
+            message: `Përshkrimi duhet të ketë të paktën ${VALIDATION_LIMITS.POST_DESCRIPTION.MIN} karaktere!`,
             error: true
         }
 
-    const maxLengthCase = z.string().max(512).safeParse(description)
+    const maxLengthCase = z
+        .string()
+        .max(VALIDATION_LIMITS.POST_DESCRIPTION.MAX)
+        .safeParse(description)
 
     if (!maxLengthCase.success)
         return {
-            message: 'Përshkrimi duhet të jetë më i shkurtë se 512 karaktere!',
+            message: `Përshkrimi duhet të ketë më së shumti ${VALIDATION_LIMITS.POST_DESCRIPTION.MAX} karaktere!`,
             error: true
         }
 

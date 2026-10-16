@@ -1,18 +1,17 @@
 import type { ValidationReturnType } from '@pikegjaku/shared/ts'
 
 import { z } from 'zod'
-const PHONE_LENGTHS: Record<string, number> = {
-    XK: 8,
-    AL: 9,
-    MK: 8
-}
+import VALIDATION_LIMITS from '@pikegjaku/shared/validations/ValidationLimits'
 
 const PhoneNumberValidation = (
     number: string | null,
     countryCode: string = 'XK'
 ): ValidationReturnType => {
     const phone = number?.toString()
-    const length = PHONE_LENGTHS[countryCode] || 8
+    const length =
+        Object.entries(VALIDATION_LIMITS.PHONE).find(
+            ([country]) => country === countryCode
+        )?.[1] ?? VALIDATION_LIMITS.PHONE.XK
 
     const stringCase = z.string().safeParse(phone)
 
@@ -22,21 +21,11 @@ const PhoneNumberValidation = (
             error: true
         }
 
-    const minLengthCase = z.string().min(length).safeParse(phone)
+    const lengthCase = z.string().length(length).safeParse(phone)
 
-    if (!minLengthCase.success)
+    if (!lengthCase.success)
         return {
-            message:
-                'Numri i telefonit duhet të jetë më i gjatë se 8 karaktere!',
-            error: true
-        }
-
-    const maxLengthCase = z.string().max(length).safeParse(phone)
-
-    if (!maxLengthCase.success)
-        return {
-            message:
-                'Numri i telefonit duhet të jetë më i shkurtë se 8 karaktere!',
+            message: `Numri i telefonit duhet të ketë ${length} shifra!`,
             error: true
         }
 

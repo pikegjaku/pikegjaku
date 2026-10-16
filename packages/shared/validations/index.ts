@@ -13,6 +13,7 @@ import PostTitleValidation from '@pikegjaku/shared/validations/PostTitleValidati
 import PostTypeValidation from '@pikegjaku/shared/validations/PostTypeValidation'
 import UserNameValidation from '@pikegjaku/shared/validations/UserNameValidation'
 import UserSurnameValidation from '@pikegjaku/shared/validations/UserSurnameValidation'
+import VALIDATION_LIMITS from '@pikegjaku/shared/validations/ValidationLimits'
 
 export {
     AvatarValidation,
@@ -29,5 +30,6 @@ export {
     PostTitleValidation,
     PostTypeValidation,
     UserNameValidation,
-    UserSurnameValidation
+    UserSurnameValidation,
+    VALIDATION_LIMITS
 }

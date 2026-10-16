@@ -220,7 +220,7 @@
 
     "@expo/sdk-runtime-versions": ["@expo/sdk-runtime-versions@1.0.0", "", {}, "sha512-Doz2bfiPndXYFPMRwPyGa1k5QaKDVpY806UJj570epIiMzWaYyCtobasyfC++qfIXVb5Ocy7r3tP9d62hAQ7IQ=="],
 
-    "@goenvless/cli": ["@goenvless/cli@0.0.4", "", { "dependencies": { "@clack/prompts": "^1.4.0", "ora": "^9.4.0" }, "bin": { "envless": "envless.js" } }, "sha512-6LEcpOExwhBAyl3kxn1tD9wU6xCKvFKNWAhSxAE4lL444OBjySMbksgUN1qRDHBHXS1xuBSknZbd/TIcHbmHVQ=="],
+    "@goenvless/cli": ["@goenvless/cli@0.0.5", "", { "dependencies": { "@clack/prompts": "^1.4.0", "ora": "^9.4.0" }, "bin": { "envless": "envless.js" } }, "sha512-Uqf/YYjulnip3Z2hkSKlx8BAs0YR4Adk09Vm097tmoj0dR7u3RJfKpxg5JJ7TSNk/LqLPWavTXOR+unaGzZ8wg=="],
 
     "@goenvless/env": ["@goenvless/env@0.0.4", "", {}, "sha512-UbgpxOCmtxGG2+HYSuDNXYPKIGQnzTbv09tDsSgaWZVRwKUEZH0pcjuiWOkddIiLkDiWpIeVOeD5AHd3NpkcSw=="],
 

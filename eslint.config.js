@@ -22,7 +22,6 @@ export default tseslint.config(
             '**/worker-configuration.d.ts',
             '**/.wrangler/**',
             '**/.astro/**',
-            'mobile/**',
             'admin/**'
         ]
     },

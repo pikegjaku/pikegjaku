@@ -15,14 +15,16 @@ Pikëgjaku is a volunteer blood donation platform connecting donors with people 
 
 ```
 pikegjaku-/
-├── mobile/            # React Native + Expo mobile app
+├── mobile/            # React Native + Expo mobile app (own install, not a workspace)
+│   ├── app/           # Expo Router routes, thin wrappers around ui/views
 │   ├── ui/            # UI layer (components, icons, illustrations, layouts, styles, views)
-│   ├── controllers/   # Data controllers (cities, countries, posts, users, etc.)
+│   ├── controllers/   # API calls, one file per action (cities, countries, centers, posts, users)
+│   ├── stores/        # Zustand stores (session, user, preferences, needs, centers, ...)
 │   ├── hooks/         # Custom React hooks
-│   ├── libs/          # Utility libraries
-│   ├── helpers/       # Helper functions
+│   ├── libs/          # Utility libraries (request client, theme, motion keyframes)
+│   ├── helpers/       # Pure helper functions
 │   ├── ts/            # Centralized types (Interfaces.ts, Types.ts)
-│   └── data/          # Static data
+│   └── data/          # Constants and static data (theme tokens, motion, routes, API paths)
 ├── api/               # Hono.js backend (Cloudflare Workers + D1)
 │   ├── controllers/   # Business logic (actions, filters, helpers, libs, middlewares)
 │   ├── router/        # Hono app wiring the routes to their middlewares
@@ -42,7 +44,7 @@ pikegjaku-/
 
 ## Tech Stack
 
-- **Mobile**: React Native 0.83 + Expo 55 + Expo Router + Zustand + twrnc (Tailwind) + Phosphor Icons + RNEUI
+- **Mobile**: React Native 0.86 + Expo 57 + Expo Router + Zustand + NativeWind 4 (Tailwind 3) + Reanimated 4 + Phosphor Icons
 - **API**: Hono.js + Cloudflare Workers + D1 (SQLite) + R2 + Cloudflare Images + jose (JWT)
 - **Web**: Astro 6 + Tailwind 4 + sitemap (deployed to Cloudflare Pages)
 - **Admin**: React + Vite
@@ -72,6 +74,8 @@ import { MyComponent } from './MyComponent'
 ```
 
 Inside `packages/shared/`, use the package name `@pikegjaku/shared/` for all imports (self-referencing). Subpath exports in `package.json` handle resolution.
+
+A file imports its siblings from their own files (`import Bind from '@/controllers/libs/d1/Bind'`), never from the barrel of its own folder: that barrel imports the file back, and Metro warns about every such require cycle.
 
 ### One Export Per File
 
@@ -145,7 +149,7 @@ All user-facing text is direct Albanian (sq_AL) string literals — no translati
 
 ### Validation
 
-All input validation length limits must be defined in `packages/shared/validations/` as a single source of truth. Never hardcode min/max lengths in controllers or components.
+All input validation length limits must be defined in `packages/shared/validations/` as a single source of truth. Never hardcode min/max lengths in controllers or components. The limits live in `VALIDATION_LIMITS` (`packages/shared/validations/ValidationLimits.ts`), which both the validators and the mobile inputs (`maxLength`, character counters) read.
 
 ### Scripts & Running
 
@@ -154,7 +158,9 @@ All scripts are defined in the **root** `package.json` and must be run from the 
 Every script that runs an app goes through `envless run --workspace bfzli --product pikegjaku --project <project> --env <env>`, so its environment is decrypted in memory from Envless. There is no non-wrapped variant.
 
 - `bun run api:dev` / `api:deploy` / `api:migrate` / `api:seed` — API (`wrangler dev` on 1111 against a local D1, deployed to Cloudflare Workers)
+- `bun run mobile:install` — install the mobile app's own dependencies (`mobile/` is not a workspace, see Mobile App below)
 - `bun run mobile:start` / `mobile:android` / `mobile:ios` / `mobile:web` / `mobile:run:android` / `mobile:run:ios` — Expo (Metro on 3333)
+- `bun run mobile:tsc` / `mobile:lint` — type check and lint the mobile app
 - `bun run web:dev` / `web:build` / `web:preview` — web (2222)
 - `bun run admin:dev` / `admin:build` / `admin:preview` — admin (5555)
 - `bun run <workspace>:exec -- <command>` — run anything with that workspace's variables
@@ -174,10 +180,22 @@ Every value comes from Envless. There are no `.env` files, no `.env.example` fil
 
 ```bash
 bun install
+bun run mobile:install
 bunx envless login
 ```
 
 After one `envless login` on the machine, every script resolves its variables itself. Anywhere a person cannot log in (CI, a container, Cloudflare Pages) set two variables instead: `ENVLESS_TOKEN`, an `ev_sk_` API key that authenticates, and `ENVLESS_KEY`, the workspace key that decrypts (Envless dashboard, CI / Machine Access). `ENVLESS_PASSPHRASE` works in place of `ENVLESS_KEY`.
+
+### Mobile App
+
+The app has three tabs, Nevojat (blood requests feed, detail, and the Krijo flow to publish one), Ambulantat (donation centers directory) and Profili (profile, my needs, appearance), behind a phone OTP login and a three-step onboarding (name, blood group, city). Its flow and motion follow the uebfaqe mobile app: a custom `AppTabBar` over a Stack whose tab screens fade, spring sheets with drag to dismiss, sliding auth steps, and a launcher that expands into a stepped overlay for creating a need.
+
+- **Own install.** `mobile/` is not a bun workspace and keeps its own `bun.lock` and `node_modules` (`bun run mobile:install`), because Expo 57 pins its own React and React Native. `mobile/metro.config.js` resolves `@/` to `mobile/` and `@pikegjaku/shared` to `packages/shared`, and resolves bare imports coming from `packages/shared` (such as `zod`) from the app's own `package.json`.
+- **Theme.** The tokens live in `mobile/data/theme-tokens.ts` as HSL triplets for `light` and `dark`. `ThemeRoot` applies them at runtime with NativeWind `vars()`, and `tailwind.config.js` maps every color to those variables, so classes like `bg-surface`, `text-zinc-500` and `bg-brand` switch with the theme. Colors outside `className` (SVG fills, navigation backgrounds) go through `useThemeColor()`. The chosen mode (`auto`, `light`, `dark`) is persisted in `usePreferencesStore`.
+- **Motion.** Every duration, easing and spring lives in `mobile/data/motion.ts`, and the shared keyframes in `mobile/libs/` (`stepEnter`, `stepExit`, `tabEnter`, `tabExit`, `heroEntrance`). Shared values use `.get()` and `.set()` so the React Compiler lint rules pass.
+- **Env.** The Envless project `mobile` holds `EXPO_PUBLIC_SERVER_URL`, `EXPO_PUBLIC_CDN_URL` and `EXPO_PUBLIC_SUPPORT_EMAIL`, read only in `mobile/libs/envs.ts`. The values are hosts without a protocol; `withProtocol` adds `http` for local hosts, and a `localhost` API host is rewritten to the Metro host so a simulator or phone reaches `wrangler dev`, which binds `0.0.0.0`.
+- **Auth.** `users/auth-user` sends a 5 digit code and `users/verify-code` returns the user with its tokens. The tokens are persisted in SecureStore and the user in AsyncStorage, and every request sends `Authorization_Access`, `Authorization_Refresh` and the latest `x-d1-bookmark`. A 401 on a signed-in request clears the session, and `useSessionEnd` in `RootNavigator` then resets the user and the loaded needs. With `ENV=local` the API logs the code (`[DEV] Verification code for …`) instead of sending an SMS.
+- **Native.** The fonts (DM Sans, Host Grotesk) are embedded by the `expo-font` config plugin, so the app runs in a development build (`bun run mobile:run:ios`), not Expo Go. The bundle identifier is `com.pikegjaku.app`.
 
 ### Web Deployment (Cloudflare Pages)
 
@@ -222,7 +240,7 @@ The API runs on Cloudflare Workers, configured in `api/wrangler.json`. `api/inde
 
 In `api:dev` the `CDN` binding is remote and points at the `pikegjaku-dev` bucket, so avatars uploaded while developing land in the real dev bucket and show at `cdn-dev.pikegjaku.com`, which is the `EXPO_PUBLIC_CDN_URL` of the mobile `local` environment. That remote binding needs `bunx wrangler login` once on the machine.
 
-**Read replication**: `pikegjaku-db` keeps its primary in Eastern Europe and has read replication on, so D1 serves reads from a copy near the user anywhere in the world. Every request runs in a D1 session opened by the `DatabaseSession` middleware, so all queries of one request see each other's writes. Routes marked `replica: true` in `api/data/Routes.ts` (the feed, a single post, countries and cities) may start on the nearest replica; every other route starts on the primary, so sign-up, verification and writes never read stale data. Every response carries an `x-d1-bookmark` header, and a client that sends it back on its next request reads data at least that fresh from any replica. The database has no jurisdiction, because a jurisdiction keeps replicas inside it.
+**Read replication**: `pikegjaku-db` keeps its primary in Eastern Europe and has read replication on, so D1 serves reads from a copy near the user anywhere in the world. Every request runs in a D1 session opened by the `DatabaseSession` middleware, so all queries of one request see each other's writes. Routes marked `replica: true` in `api/data/Routes.ts` (the feed, a single post, countries, cities and the public `centers/list-centers` directory) may start on the nearest replica; every other route starts on the primary, so sign-up, verification and writes never read stale data. Every response carries an `x-d1-bookmark` header, and a client that sends it back on its next request reads data at least that fresh from any replica. The database has no jurisdiction, because a jurisdiction keeps replicas inside it.
 
 **Secrets**: `secrets.required` in `api/wrangler.json` is the one list of variables the API reads. `api:dev` binds them from the Envless `local` environment, and `api:deploy` uploads them from the Envless `prod` environment together with the code through `wrangler deploy --secrets-file`, so nothing is written to disk. A new variable goes into Envless and `secrets.required`, then `bun run api:types` regenerates `api/worker-configuration.d.ts`.
 

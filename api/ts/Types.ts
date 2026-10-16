@@ -71,6 +71,12 @@ export type PostListFilterFunctionPropTypes = {
     mode: PostTypes
 }
 
+export type CentersListFilterFunctionPropTypes = {
+    term: string | null
+    country: string | null
+    city: string | null
+}
+
 export type RequestResponseTypes = {
     success: boolean
     message: string

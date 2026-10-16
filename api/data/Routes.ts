@@ -21,6 +21,7 @@ import {
 
 import { ListCities } from '@/controllers/actions/cities'
 import { ListCountries } from '@/controllers/actions/countries'
+import { ListCenters } from '@/controllers/actions/centers'
 
 import { JoinWaitlist } from '@/controllers/actions/generals'
 
@@ -36,7 +37,7 @@ import {
     DetailCountry,
     DetailPost,
     DetailUser,
-    ListCenters,
+    ListCenters as AdminListCenters,
     ListCities as AdminListCities,
     ListCountries as AdminListCountries,
     ListPosts as AdminListPosts,
@@ -51,6 +52,7 @@ import {
 
 import {
     ADMIN_ROUTES,
+    CENTERS_ROUTES,
     CITIES_ROUTES,
     COUNTRIES_ROUTES,
     GENERAL_ROUTES,
@@ -79,6 +81,8 @@ const ROUTES: RouteDefinition[] = [
 
     { group: GROUP_ROUTES.CITIES, path: CITIES_ROUTES.LIST_CITIES, auth: 'public', handler: ListCities, replica: true },
 
+    { group: GROUP_ROUTES.CENTERS, path: CENTERS_ROUTES.LIST_CENTERS, auth: 'public', handler: ListCenters, replica: true },
+
     { group: GROUP_ROUTES.GENERALS, path: GENERAL_ROUTES.JOIN_WAITLIST, auth: 'public', handler: JoinWaitlist },
 
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.STATS, auth: 'admin', handler: Stats },
@@ -90,7 +94,7 @@ const ROUTES: RouteDefinition[] = [
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.DETAIL_CITY, auth: 'admin', handler: DetailCity },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.LIST_COUNTRIES, auth: 'admin', handler: AdminListCountries },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.DETAIL_COUNTRY, auth: 'admin', handler: DetailCountry },
-    { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.LIST_CENTERS, auth: 'admin', handler: ListCenters },
+    { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.LIST_CENTERS, auth: 'admin', handler: AdminListCenters },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.DETAIL_CENTER, auth: 'admin', handler: DetailCenter },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.UPDATE_USER, auth: 'admin', handler: AdminUpdateUser },
     { group: GROUP_ROUTES.ADMIN, path: ADMIN_ROUTES.UPDATE_COUNTRY, auth: 'admin', handler: UpdateCountry },

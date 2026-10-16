@@ -92,6 +92,7 @@ export const GROUP_ROUTES = {
     POSTS: '/posts',
     COUNTRIES: '/countries',
     CITIES: '/cities',
+    CENTERS: '/centers',
     VERIFICATIONS: '/verifications',
     GENERALS: '/generals',
     ADMIN: '/admin'
@@ -147,6 +148,10 @@ export const CITIES_ROUTES = {
 
 export const COUNTRIES_ROUTES = {
     LIST_COUNTRIES: '/list-countries'
+}
+
+export const CENTERS_ROUTES = {
+    LIST_CENTERS: '/list-centers'
 }
 
 export const GENERAL_ROUTES = {
