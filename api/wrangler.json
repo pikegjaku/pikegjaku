@@ -58,9 +58,9 @@
             "AUTH_ACCESS_TOKEN_SECRET",
             "AUTH_REFRESH_TOKEN_SECRET",
             "ENV",
-            "OPENEMAIL_ADMIN",
-            "OPENEMAIL_API_KEY",
-            "OPENEMAIL_FROM",
+            "NEXTMAIL_ADMIN",
+            "NEXTMAIL_API_KEY",
+            "NEXTMAIL_FROM",
             "ORIGINS",
             "SENT_API_KEY",
             "SENT_TEMPLATE_ID"

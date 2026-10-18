@@ -4,7 +4,7 @@ import { env } from 'cloudflare:workers'
 let client: Nextmail | null = null
 
 const Client = (): Nextmail => {
-    if (!client) client = new Nextmail({ apiKey: env.OPENEMAIL_API_KEY })
+    if (!client) client = new Nextmail({ apiKey: env.NEXTMAIL_API_KEY })
 
     return client
 }

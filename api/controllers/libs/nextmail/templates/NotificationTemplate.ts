@@ -1,6 +1,6 @@
 import type { NotificationTemplateProps } from '@/ts'
 
-import EmailLayout from '@/controllers/libs/openemail/templates/EmailLayout'
+import EmailLayout from '@/controllers/libs/nextmail/templates/EmailLayout'
 import { EscapeHtml } from '@/controllers/helpers/generals'
 import { BRAND } from '@/data/constants'
 

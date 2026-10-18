@@ -1,6 +1,6 @@
 import type { EmailLayoutProps } from '@/ts'
 
-import Logo from '@/controllers/libs/openemail/templates/Logo'
+import Logo from '@/controllers/libs/nextmail/templates/Logo'
 import { BRAND } from '@/data/constants'
 
 const EmailLayout = ({ preheader, heading, body }: EmailLayoutProps): string =>

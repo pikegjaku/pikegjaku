@@ -1,12 +1,12 @@
 import { env } from 'cloudflare:workers'
-import Client from '@/controllers/libs/openemail/Client'
-import { WelcomeTemplate } from '@/controllers/libs/openemail/templates'
+import Client from '@/controllers/libs/nextmail/Client'
+import { WelcomeTemplate } from '@/controllers/libs/nextmail/templates'
 import Console from '@/controllers/helpers/logs/Console'
 
 const SendWelcomeEmail = async (email: string): Promise<false | string> => {
     try {
         const sent = await Client().emails.send({
-            from: env.OPENEMAIL_FROM,
+            from: env.NEXTMAIL_FROM,
             to: email,
             subject: 'Mirë se vjen në Pikëgjaku',
             html: WelcomeTemplate(email),

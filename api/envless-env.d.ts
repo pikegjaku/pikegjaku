@@ -7,9 +7,9 @@ declare global {
             AUTH_ACCESS_TOKEN_SECRET: string
             AUTH_REFRESH_TOKEN_SECRET: string
             ENV: string
-            OPENEMAIL_ADMIN: string
-            OPENEMAIL_API_KEY: string
-            OPENEMAIL_FROM: string
+            NEXTMAIL_ADMIN: string
+            NEXTMAIL_API_KEY: string
+            NEXTMAIL_FROM: string
             ORIGINS: string
             SENT_API_KEY: string
             SENT_TEMPLATE_ID: string
@@ -22,9 +22,9 @@ declare module '@goenvless/env/server' {
         AUTH_ACCESS_TOKEN_SECRET: string
         AUTH_REFRESH_TOKEN_SECRET: string
         ENV: string
-        OPENEMAIL_ADMIN: string
-        OPENEMAIL_API_KEY: string
-        OPENEMAIL_FROM: string
+        NEXTMAIL_ADMIN: string
+        NEXTMAIL_API_KEY: string
+        NEXTMAIL_FROM: string
         ORIGINS: string
         SENT_API_KEY: string
         SENT_TEMPLATE_ID: string

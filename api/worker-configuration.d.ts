@@ -8,9 +8,9 @@ interface __BaseEnv_Env {
 	AUTH_ACCESS_TOKEN_SECRET: string;
 	AUTH_REFRESH_TOKEN_SECRET: string;
 	ENV: string;
-	OPENEMAIL_ADMIN: string;
-	OPENEMAIL_API_KEY: string;
-	OPENEMAIL_FROM: string;
+	NEXTMAIL_ADMIN: string;
+	NEXTMAIL_API_KEY: string;
+	NEXTMAIL_FROM: string;
 	ORIGINS: string;
 	SENT_API_KEY: string;
 	SENT_TEMPLATE_ID: string;
@@ -26,7 +26,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "AUTH_ACCESS_TOKEN_SECRET" | "AUTH_REFRESH_TOKEN_SECRET" | "ENV" | "OPENEMAIL_ADMIN" | "OPENEMAIL_API_KEY" | "OPENEMAIL_FROM" | "ORIGINS" | "SENT_API_KEY" | "SENT_TEMPLATE_ID">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "AUTH_ACCESS_TOKEN_SECRET" | "AUTH_REFRESH_TOKEN_SECRET" | "ENV" | "NEXTMAIL_ADMIN" | "NEXTMAIL_API_KEY" | "NEXTMAIL_FROM" | "ORIGINS" | "SENT_API_KEY" | "SENT_TEMPLATE_ID">> {}
 }
 
 // Begin runtime types

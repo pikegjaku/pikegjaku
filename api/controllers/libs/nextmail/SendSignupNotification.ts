@@ -1,8 +1,8 @@
 import type { NotificationTemplateProps } from '@/ts'
 
 import { env } from 'cloudflare:workers'
-import Client from '@/controllers/libs/openemail/Client'
-import { NotificationTemplate } from '@/controllers/libs/openemail/templates'
+import Client from '@/controllers/libs/nextmail/Client'
+import { NotificationTemplate } from '@/controllers/libs/nextmail/templates'
 import Console from '@/controllers/helpers/logs/Console'
 
 const SendSignupNotification = async ({
@@ -12,8 +12,8 @@ const SendSignupNotification = async ({
 }: NotificationTemplateProps): Promise<boolean> => {
     try {
         await Client().emails.send({
-            from: env.OPENEMAIL_FROM,
-            to: env.OPENEMAIL_ADMIN,
+            from: env.NEXTMAIL_FROM,
+            to: env.NEXTMAIL_ADMIN,
             replyTo: email,
             subject: `Regjistrim i ri në listën e pritjes — ${email}`,
             html: NotificationTemplate({ email, total, date }),

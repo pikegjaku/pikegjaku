@@ -7,7 +7,7 @@ import { WaitlistsTable } from '@/data/tables'
 import {
     SendSignupNotification,
     SendWelcomeEmail
-} from '@/controllers/libs/openemail'
+} from '@/controllers/libs/nextmail'
 import { Console } from '@/controllers/helpers/logs'
 import { IsReservedEmail } from '@/controllers/helpers/generals'
 import { CurrentTimestamp, FormatDate } from '@/data/dates'
