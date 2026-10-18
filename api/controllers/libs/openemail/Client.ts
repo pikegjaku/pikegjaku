@@ -1,10 +1,10 @@
-import { OpenEmail } from '@openemail/sdk'
+import { Nextmail } from '@nextmail/sdk'
 import { env } from 'cloudflare:workers'
 
-let client: OpenEmail | null = null
+let client: Nextmail | null = null
 
-const Client = (): OpenEmail => {
-    if (!client) client = new OpenEmail({ apiKey: env.OPENEMAIL_API_KEY })
+const Client = (): Nextmail => {
+    if (!client) client = new Nextmail({ apiKey: env.OPENEMAIL_API_KEY })
 
     return client
 }

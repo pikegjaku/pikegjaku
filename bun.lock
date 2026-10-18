@@ -28,7 +28,7 @@
       "version": "0.0.0-alpha.45",
       "dependencies": {
         "@goenvless/env": "latest",
-        "@openemail/sdk": "latest",
+        "@nextmail/sdk": "0.0.1",
         "@pikegjaku/shared": "*",
         "hono": "^4.3.4",
         "jose": "^6.2.12",
@@ -304,13 +304,13 @@
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.4", "", { "dependencies": { "@tybys/wasm-util": "^0.10.1" }, "peerDependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1" } }, "sha512-3NQNNgA1YSlJb/kMH1ildASP9HW7/7kYnRI2szWJaofaS1hWmbGI4H+d3+22aGzXXN9IJ+n+GiFVcGipJP18ow=="],
 
+    "@nextmail/sdk": ["@nextmail/sdk@0.0.1", "", {}, "sha512-pWh5SYk0k1XKQZUa0fJNuNaDvNyLjmP/wJG2M7uKEmaDhARUyKWwCLLpXCGMnmpm9Vrgs6mI/oRGPp3npUlXWw=="],
+
     "@nodelib/fs.scandir": ["@nodelib/fs.scandir@2.1.5", "", { "dependencies": { "@nodelib/fs.stat": "2.0.5", "run-parallel": "^1.1.9" } }, "sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g=="],
 
     "@nodelib/fs.stat": ["@nodelib/fs.stat@2.0.5", "", {}, "sha512-RkhPPp2zrqDAQA/2jNhnztcPAlv64XdhIp7a7454A5ovI7Bukxgt7MX7udwAu3zg1DcpPU0rz3VV1SeaqvY4+A=="],
 
     "@nodelib/fs.walk": ["@nodelib/fs.walk@1.2.8", "", { "dependencies": { "@nodelib/fs.scandir": "2.1.5", "fastq": "^1.6.0" } }, "sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg=="],
-
-    "@openemail/sdk": ["@openemail/sdk@0.0.7", "", {}, "sha512-SN3NdV/HNhFDebku9FvW5wz2bXAjYFtkIDwihkwvitktOT4+c4ZHBiV4uXViLmwQjQhqrk1XXn6lSsTmhStncw=="],
 
     "@oslojs/encoding": ["@oslojs/encoding@1.1.0", "", {}, "sha512-70wQhgYmndg4GCPxPPxPGevRKqTIJ2Nh4OkiMWmDAVYsTQ+Ta7Sq+rPevXyXGdzr30/qZBnyOalCszoMxlyldQ=="],
 
