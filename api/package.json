@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@goenvless/env": "latest",
-        "@nextmail/sdk": "0.0.1",
+        "@nextmail/sdk": "0.0.2",
         "@pikegjaku/shared": "*",
         "hono": "^4.3.4",
         "jose": "^6.2.12",
